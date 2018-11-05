@@ -1,0 +1,12 @@
+R -> D i R | D 
+D -> S D | S 
+S -> G * | G 
+G -> C | ( R )
+
+R → D R'.
+D → S D'.
+S → G S'.
+G → z | ( R ).
+R' → i R | .
+D' → z S' D' | ( R ) S' D' | .
+S' → * | .
