@@ -54,14 +54,17 @@ public class LexicalAnalyzer {
                 break;
             default:
                 if (Character.isLetterOrDigit(curChar())) {
-                    StringBuilder builder = new StringBuilder(Character.toString(curChar()));
+                    /*StringBuilder builder = new StringBuilder(Character.toString(curChar()));
                     nextChar();
                     while (Character.isLetterOrDigit(curChar())) {
                         builder.append(curChar());
                         nextChar();
                     }
                     curToken = Token.STR;
-                    curStr = builder.toString();
+                    curStr = builder.toString();*/
+                    curToken = Token.STR;
+                    curStr = Character.toString(curChar());
+                    nextChar();
                 } else {
                     throw new ParseException("Illegal character '" + (char) curChar + "'", curPos);
                 }

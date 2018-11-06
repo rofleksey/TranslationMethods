@@ -1,3 +1,4 @@
+import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
@@ -27,6 +28,9 @@ public class Visualizer {
         MutableNode me = mutNode(Integer.toString(MAX_ID++)).add("label", child.text);
         if(child.children.isEmpty()) {
             me.attrs().add(Style.FILLED, Shape.RECTANGLE);
+        }
+        if(child.text.contains("'") && child.children.size() == 1) {
+            me.attrs().add(Color.ALICEBLUE);
         }
         parent.addLink(me);
         for(Tree t : child.children) {

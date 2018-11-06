@@ -15,7 +15,7 @@ public class LexicalAnalyzerTest {
 
     @Test
     public void multipleCharsTest() {
-        test("oraoraoraora1337ariariari", Arrays.asList(Token.STR), Arrays.asList("oraoraoraora1337ariariari"));
+        test("ora", Arrays.asList(Token.STR, Token.STR, Token.STR), Arrays.asList("o", "r", "a"));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class LexicalAnalyzerTest {
 
     @Test
     public void star1Test() {
-        test("jotaro*", Arrays.asList(Token.STR, Token.STAR), Arrays.asList("jotaro"));
+        test("jo*", Arrays.asList(Token.STR, Token.STR, Token.STAR), Arrays.asList("j", "o"));
     }
 
     @Test
@@ -36,14 +36,14 @@ public class LexicalAnalyzerTest {
     @Test
     public void simple() {
         test("((a)*|b)*|c", Arrays.asList(Token.LB, Token.LB, Token.STR, Token.RB, Token.STAR, Token.OR, Token.STR, Token.RB, Token.STAR, Token.OR, Token.STR),
-                Arrays.asList("a","b","c"));
+                Arrays.asList("a", "b", "c"));
     }
 
     @Test
     public void exampleTest() {
-        test("((abc*b|a)*ab(aa|b*)b)*", Arrays.asList(Token.LB, Token.LB, Token.STR, Token.STAR, Token.STR, Token.OR,
-                Token.STR, Token.RB, Token.STAR, Token.STR, Token.LB, Token.STR, Token.OR, Token.STR, Token.STAR, Token.RB, Token.STR, Token.RB, Token.STAR),
-                Arrays.asList("abc", "b", "a", "ab", "aa", "b", "b"));
+        test("((abc*b|a)*ab(aa|b*)b)*", Arrays.asList(Token.LB, Token.LB, Token.STR, Token.STR, Token.STR, Token.STAR, Token.STR, Token.OR,
+                Token.STR, Token.RB, Token.STAR, Token.STR,Token.STR, Token.LB, Token.STR, Token.STR, Token.OR, Token.STR, Token.STAR, Token.RB, Token.STR, Token.RB, Token.STAR),
+                Arrays.asList("a", "b", "c", "b", "a", "a", "b", "a", "a", "b", "b"));
     }
 
     private void test(String input, List<Token> answer, List<String> strings) {
