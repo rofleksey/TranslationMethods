@@ -1,5 +1,4 @@
 import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.*;
@@ -11,10 +10,10 @@ import java.util.Collections;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
-public class Visualizer {
-    static int MAX_ID = 0;
+class Visualizer {
+    private static int MAX_ID = 0;
 
-    public static void save(Tree root, String where) throws IOException {
+    static void save(Tree root, String where) throws IOException {
         MutableNode main = mutNode(root.text);
         for(Tree t : root.children) {
             traverse(main, t);
