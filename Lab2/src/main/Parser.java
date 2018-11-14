@@ -16,6 +16,7 @@ public class Parser {
 
     private Tree DFlex() throws ParseException {
         switch (lex.curToken()) {
+            /*
             case STR:
                 return new Tree("D'", C(), SFlex(), DFlex());
             case LB:
@@ -26,6 +27,11 @@ public class Parser {
                 }
                 lex.nextToken();
                 return new Tree("D'", new Tree("("), sub, new Tree(")"), SFlex(), DFlex());
+            default:
+                return new Tree("D'", Tree.epsilon());*/
+            case STR:
+            case LB:
+                return new Tree("D'", S(), DFlex());
             default:
                 return new Tree("D'", Tree.epsilon());
         }
@@ -56,7 +62,7 @@ public class Parser {
         switch (lex.curToken()) {
             case OR:
                 lex.nextToken();
-                return new Tree("R'", new Tree("|"), Ro());
+                return new Tree("R'", new Tree("|"), D(), RoFlex());
             default:
                 return new Tree("R'", Tree.epsilon());
         }

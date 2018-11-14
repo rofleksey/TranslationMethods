@@ -14,7 +14,7 @@ public class ParserTest {
 
     @Test
     public void multipleCharsTest() {
-        test("oraoraoraora1337ariariari");
+        test("ora123ari");
     }
 
     @Test
@@ -24,7 +24,7 @@ public class ParserTest {
 
     @Test
     public void star1Test() {
-        test("jotaro*");
+        test("jo1taro*");
     }
 
     @Test
