@@ -1,20 +1,15 @@
-R -> D i R | D
-D -> S D | S
-S -> G * | G
-G -> C | ( R )
-
-R -> D R'
-D -> S D'
-S -> G S'
-G -> C | ( R )
-R' -> i R | ϵ
-D' -> D | ϵ
-S' -> * | ϵ
+//new
 
 R -> R i D | D
 D -> D S | S
 S -> G * | G
 G -> C | ( R )
+
+R -> R i D | D
+D -> D S | S
+S -> G S'
+G -> C | ( R )
+S' -> * | ϵ
 
 R -> D R'
 D -> S D'
