@@ -152,15 +152,8 @@ directDeclarator
     :   Identifier
     |   '(' declarator ')'
     |   directDeclarator '[' assignmentExpression? ']'
-    |   directDeclarator '[' '*' ']'
     |   directDeclarator '(' parameterList ')'
     |   directDeclarator '(' identifierList? ')'
-    ;
-
-nestedParenthesesBlock
-    :   (   ~('(' | ')')
-        |   '(' nestedParenthesesBlock ')'
-        )*
     ;
 
 pointer
@@ -195,10 +188,8 @@ abstractDeclarator
 directAbstractDeclarator
     :   '(' abstractDeclarator ')'
     |   '[' assignmentExpression? ']'
-    |   '[' '*' ']'
     |   '(' parameterList? ')'
     |   directAbstractDeclarator '[' assignmentExpression? ']'
-    |   directAbstractDeclarator '[' '*' ']'
     |   directAbstractDeclarator '(' parameterList? ')'
     ;
 

@@ -1,0 +1,20 @@
+//new
+
+R -> R i D | D
+D -> D S | S
+S -> G * | G
+G -> C | ( R )
+
+R -> R i D | D
+D -> D S | S
+S -> G S'
+G -> C | ( R )
+S' -> * | ϵ
+
+R -> D R'
+D -> S D'
+S -> G S'
+G -> C | ( R )
+R' -> i D R' | ϵ
+D' -> S D' | ϵ
+S' -> * | ϵ
