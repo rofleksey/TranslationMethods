@@ -26,3 +26,12 @@ int main() {
   printf("Hello world");
   return 0;
 }
+void final(int a, int b, int c) {
+  if (a) {
+    if (b) {
+      if (c) {
+        return;
+      }
+    }
+  }
+}
