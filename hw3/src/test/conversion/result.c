@@ -22,3 +22,7 @@ void test() {}
 void another() {
   plus(a = 5 * 2, c = 3);
 }
+int main() {
+  printf("Hello world");
+  return 0;
+}
