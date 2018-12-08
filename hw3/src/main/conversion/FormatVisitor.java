@@ -138,11 +138,11 @@ public class FormatVisitor extends CBaseVisitor<Void> {
     @Override
     public Void visitCompoundStatement(CParser.CompoundStatementContext ctx) {
         builder.append("{");
-        newLine(1);
         if (ctx.e != null) {
+            newLine(1);
             visit(ctx.e);
+            newLine(-1);
         }
-        newLine(-1);
         builder.append("}");
         if (!ctx.ignoreNextLine) {
             newLine();
