@@ -206,4 +206,9 @@ public class FormatVisitor extends CBaseVisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitExprEmpty(CParser.ExprEmptyContext ctx) {
+        return null;
+    }
+
 }

@@ -135,8 +135,8 @@ blockItem returns [boolean ign]
     ;
 
 expressionStatement returns [boolean ign]
-    :   assignmentExpression Semi
-    |   Semi {$ign = true;}
+    :   e=assignmentExpression Semi #exprMeaningful
+    |   Semi {$ign = true;} #exprEmpty
     ;
 
 selectionStatement
