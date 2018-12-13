@@ -1,0 +1,63 @@
+%package
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Arrays;
+
+public class %classnameParser {
+    private %classnameLexer lex;
+
+    public static class Tree {
+        private final String name;
+        private final Tree[] children;
+        private Object userData;
+
+        private Tree(String name, Tree ... children) {
+            this.name = name;
+            this.children = children;
+        }
+        public String getName() {
+            return name;
+        }
+        public Tree[] getChildren() {
+            return children;
+        }
+        public void setUserData(Object o) {
+            userData = o;
+        }
+        public Object getUserData() {
+            return userData;
+        }
+        @Override
+        public String toString() {
+            return children.length == 0 ? name : "<"+name+": "+Arrays.toString(children)+">";
+        }
+    }
+
+    public static class TerminalContext extends Tree {
+        private final %classnameLexer.Token token;
+        private TerminalContext(%classnameLexer.Token token) {
+            super(token.text);
+            this.token = token;
+        }
+        public %classnameLexer.Token getToken() {
+            return token;
+        }
+    }
+%contexts
+%terminals
+%builders
+    public %mainRuleContext parse(String s) throws %classnameLexer.ParseException {
+        return parse(new StringReader(s));
+    }
+
+    public %mainRuleContext parse(Reader r) throws %classnameLexer.ParseException {
+        lex = new %classnameLexer(r);
+        lex.nextToken();
+        %mainRuleContext t = %mainToken();
+        if(lex.curToken().type != %classnameLexer.TokenType.EOF) {
+            throw new %classnameLexer.ParseException("Unexpected end of input", lex.curPos());
+        }
+        return t;
+    }
+}

@@ -1,0 +1,11 @@
+
+    private TerminalContext %name() throws %classnameLexer.ParseException {
+        switch (lex.curToken().type) {
+            case %upName:
+                %classnameLexer.Token token = lex.curToken();
+                lex.nextToken();
+                return new TerminalContext(token);
+            default:
+                throw new %classnameLexer.ParseException("Invalid character. Token types [ %upName ] expected", lex.curPos());
+        }
+    }

@@ -8,3 +8,24 @@ printf( "Hello world"
 ;}
 
 void final(int a,int b,int c) {if(a){if(b){if(c){return;}}}}
+
+void forTest() {
+for(;;){}for(;;){int a = 1;}
+for(a=1;;) {int b = 2;}
+for(a=1;a<=1;) {int b = 2;while(a){for(;;){}}}
+for(a=1;a<=1;a+=1) {int b = 2;}
+for(int a; a<=1; a+=1) {final(kek, lol,orel);}
+for(int a=5; a<=1; a+=1) {final(kek, lol,orel);}
+}
+
+struct DZ3 {
+int s;int l;int privet=1337;}
+
+struct Empty {
+
+
+
+}
+
+void inlineStructTest() {DZ3 obj;obj.s += obj.l;
+}

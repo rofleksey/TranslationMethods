@@ -1,0 +1,9 @@
+
+    public static class %upNameContext extends Tree {
+%fields
+
+        private %upNameContext(Tree... children) {
+            super("%name", children);
+        }
+%calc
+    }

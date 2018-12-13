@@ -14,6 +14,7 @@ primaryExpression
 postfixExpression
     :   primaryExpression
     |   postfixExpression '(' argumentExpressionList? ')'
+    |   postfixExpression '.' Identifier
     ;
 
 argumentExpressionList
@@ -144,8 +145,33 @@ selectionStatement
     ;
 
 iterationStatement
-    :   While '(' e1=assignmentExpression ')' e2=compoundStatement
+    :   name=While '(' e1=assignmentExpression ')' e2=compoundStatement
+    |   name=For '(' f1=forCondition ')' e2=compoundStatement
     ;
+
+forCondition
+	:   d=forDeclaration? ';' e1=forExpression? ';' e2=forExpression?
+	|   a=assignmentExpression? ';' e1=forExpression? ';' e2=forExpression?
+	;
+
+forExpression
+    :   assignmentExpression #forExprNextLevel
+    |   e1=forExpression ',' e2=assignmentExpression #forExpr1
+    ;
+
+forDeclaration
+    :   e1=typeSpecifier e2=initDeclarator
+    ;
+
+structSpecifier
+    :   'struct' n=Identifier '{' list=structDeclarationList? '}'
+    ;
+
+structDeclarationList
+    :   declaration #structDecNextLevel
+    |   e1=structDeclarationList e2=declaration #structDec1
+    ;
+
 
 jumpStatement
     :   Continue Semi #jumpContinue
@@ -154,8 +180,13 @@ jumpStatement
     ;
 
 translationUnit
-    :   functionDefinition
-    |   translationUnit functionDefinition
+    :   externalDefinition
+    |   translationUnit externalDefinition
+    ;
+
+externalDefinition
+    : functionDefinition
+    | structSpecifier
     ;
 
 functionDefinition
@@ -176,6 +207,7 @@ Return : 'return';
 Short : 'short';
 Void : 'void';
 While : 'while';
+For: 'for';
 
 LeftParen : '(';
 RightParen : ')';

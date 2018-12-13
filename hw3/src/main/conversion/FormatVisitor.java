@@ -177,10 +177,44 @@ public class FormatVisitor extends CBaseVisitor<Void> {
 
     @Override
     public Void visitIterationStatement(CParser.IterationStatementContext ctx) {
-        builder.append("while (");
-        visit(ctx.e1);
+        builder.append(ctx.name.getText());
+        builder.append(" (");
+        visit(ctx.e1 != null ? ctx.e1 : ctx.f1);
         builder.append(") ");
         ctx.e2.ignoreNextLine = true;
+        visit(ctx.e2);
+        return null;
+    }
+
+    @Override
+    public Void visitForCondition(CParser.ForConditionContext ctx) {
+        if (ctx.d != null || ctx.a != null) {
+            visit(ctx.d != null ? ctx.d : ctx.a);
+        }
+        builder.append(";").append(ctx.e1 != null ? " " : "");
+        if (ctx.e1 != null) {
+            visit(ctx.e1);
+        }
+        builder.append(";").append(ctx.e2 != null ? " " : "");
+        if (ctx.e2 != null) {
+            visit(ctx.e2);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitForDeclaration(CParser.ForDeclarationContext ctx) {
+        visit(ctx.e1);
+        builder.append(" ");
+        visit(ctx.e2);
+        return null;
+    }
+
+
+    @Override
+    public Void visitForExpr1(CParser.ForExpr1Context ctx) {
+        visit(ctx.e1);
+        builder.append(", ");
         visit(ctx.e2);
         return null;
     }
@@ -203,6 +237,27 @@ public class FormatVisitor extends CBaseVisitor<Void> {
         visit(ctx.e2);
         builder.append(" ");
         visit(ctx.e3);
+        return null;
+    }
+
+    @Override
+    public Void visitStructSpecifier(CParser.StructSpecifierContext ctx) {
+        builder.append("struct ").append(ctx.n.getText()).append(" ").append("{");
+        if (ctx.list != null) {
+            newLine(1);
+            visit(ctx.list);
+            newLine(-1);
+        }
+        builder.append("}");
+        newLine();
+        return null;
+    }
+
+    @Override
+    public Void visitStructDec1(CParser.StructDec1Context ctx) {
+        visit(ctx.e1);
+        newLine();
+        visit(ctx.e2);
         return null;
     }
 

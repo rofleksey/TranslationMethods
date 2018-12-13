@@ -1,0 +1,23 @@
+E -> [int num]
+    e1=T e2=E1 {num = e1.num + e2.num}
+
+E1 -> [int num]
+    PLUS e1=T e2=E1 {num = e1.num + e2.num}
+    @ {num = 0}
+
+T -> [int num]
+    e1=F e2=T1 {num = e1.num * e2.num}
+
+T1 -> [int num]
+    MULT e1=F e2=T1 {num = e1.num * e2.num}
+    @ {num = 1}
+
+F -> [int num]
+    e=NUM {num = e.getToken().toInt()}
+    LB e1=E RB {num = e1.num}
+
+NUM := @number
+MULT := '*'
+PLUS := '+'
+LB := '('
+RB := ')'

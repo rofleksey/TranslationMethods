@@ -1,0 +1,9 @@
+
+    private %upNameContext %name() throws %classnameLexer.ParseException {
+        %upNameContext result;
+        switch (lex.curToken().type) {
+%cases
+            default:
+                throw new %classnameLexer.ParseException("Invalid character. Token types [ %expectedTokens ] expected", lex.curPos());
+        }
+    }
