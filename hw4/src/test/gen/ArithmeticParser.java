@@ -139,7 +139,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ NUM ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "NUM", lex);
         }
     }
 
@@ -150,7 +150,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ MULT ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "MULT", lex);
         }
     }
 
@@ -161,7 +161,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PLUS ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "PLUS", lex);
         }
     }
 
@@ -172,7 +172,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB", lex);
         }
     }
 
@@ -183,7 +183,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "RB", lex);
         }
     }
 
@@ -205,7 +205,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
         }
     }
 
@@ -231,7 +231,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, PLUS, RB ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, PLUS, RB", lex);
         }
     }
 
@@ -252,7 +252,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
         }
     }
 
@@ -279,7 +279,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, MULT, PLUS, RB ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULT, PLUS, RB", lex);
         }
     }
 
@@ -306,7 +306,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
         }
     }
 

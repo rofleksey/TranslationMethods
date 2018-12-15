@@ -38,13 +38,13 @@ setListFlex -> [Set<String> set]
     COMMA e1=LETTER e2=setListFlex {$.set = e2.set; $.set.add(e1.getText());}
     @ {$.set = new HashSet<>()}
 
-DOLLAR := '$'
+DOLLAR := '$all'
 PERCENT := '%'
 PLUS := '+'
 MINUS := '-'
 LB := '('
 RB := ')'
-LS := '<'
-RS := '>'
+LS := '<<'
+RS := '>>'
 COMMA := ','
 LETTER := @lowAlpha

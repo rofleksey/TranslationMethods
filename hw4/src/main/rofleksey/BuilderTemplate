@@ -5,6 +5,6 @@
         switch (lex.curToken().type) {
 %cases
             default:
-                throw new %classnameLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ %expectedTokens ] expected", lex.lastPos());
+                throw new %classnameLexer.ParseException(lex.curToken().type, "%expectedTokens", lex);
         }
     }

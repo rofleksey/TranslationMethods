@@ -43,7 +43,7 @@ class ResultTest {
         ArithmeticLexer.ParseException exception = assertThrows(ArithmeticLexer.ParseException.class, () -> {
             testArithmeticImpl("5+", 0);
         });
-        assertEquals("Parse error: Invalid token EOF. Token types [ LB, NUM ] expected at pos=2", exception.getMessage());
+        assertEquals("Parse error: Invalid token EOF. Token types [ LB, NUM ] expected at pos=3", exception.getMessage());
     }
 
     @Test
@@ -92,7 +92,7 @@ class ResultTest {
         RegexLexer.ParseException exception = assertThrows(RegexLexer.ParseException.class, () -> {
             testRegexImpl("a|b|", 0, 0);
         });
-        assertEquals("Parse error: Invalid token EOF. Token types [ C, LB ] expected at pos=4", exception.getMessage());
+        assertEquals("Parse error: Invalid token EOF. Token types [ C, LB ] expected at pos=5", exception.getMessage());
     }
 
     @Test
@@ -111,43 +111,59 @@ class ResultTest {
 
     @Test
     void testSets1() throws SetLexer.ParseException {
-        testSetsImpl("$-a%y+($-($-<a, d, e>) + <e>)+x%x", "[a, d, e, x, z]");
+        testSetsImpl("$all-a%y+($all-($all-<<a, d, e>>) + <<e>>)+x%x", "[a, d, e, x, z]");
     }
 
     @Test
     void testSets2() throws SetLexer.ParseException {
-        testSetsImpl("a%f+f%x+<y, z>-$", "[]");
+        testSetsImpl("a%f+f%x+<<y, z>>-$all", "[]");
     }
 
     @Test
     void testSetsFail1() throws SetLexer.ParseException {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
-            testSetsImpl("<>", "");
+            testSetsImpl("<<>>", "");
         });
-        assertEquals("Parse error: Invalid token RS. Token types [ LETTER ] expected at pos=2", exception.getMessage());
+        assertEquals("Parse error: Invalid token RS. Token types [ LETTER ] expected at pos=3", exception.getMessage());
     }
 
     @Test
     void testSetsFail2() throws SetLexer.ParseException {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
-            testSetsImpl("a%", "");
+            testSetsImpl("<>", "");
         });
-        assertEquals("Parse error: Invalid token EOF. Token types [ LETTER ] expected at pos=2", exception.getMessage());
+        assertEquals("Parse error: Invalid input at pos=2", exception.getMessage());
     }
 
     @Test
     void testSetsFail3() throws SetLexer.ParseException {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
-            testSetsImpl("<a,>+<z>", "");
+            testSetsImpl("a%", "");
         });
-        assertEquals("Parse error: Invalid token RS. Token types [ LETTER ] expected at pos=4", exception.getMessage());
+        assertEquals("Parse error: Invalid token EOF. Token types [ LETTER ] expected at pos=3", exception.getMessage());
     }
 
     @Test
     void testSetsFail4() throws SetLexer.ParseException {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
-            testSetsImpl("<a>$+<b>", "");
+            testSetsImpl("<<a,>>+<<z>>", "");
         });
-        assertEquals("Parse error: Invalid token DOLLAR. Token types [ EOF, MINUS, PLUS, RB ] expected at pos=4", exception.getMessage());
+        assertEquals("Parse error: Invalid token RS. Token types [ LETTER ] expected at pos=5", exception.getMessage());
+    }
+
+    @Test
+    void testSetsFail5() throws SetLexer.ParseException {
+        SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
+            testSetsImpl("<<a>>$+<<b>>", "");
+        });
+        assertEquals("Parse error: Invalid input at pos=7", exception.getMessage());
+    }
+
+    @Test
+    void testSetsFail6() throws SetLexer.ParseException {
+        SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
+            testSetsImpl("<<a>>$all+<<b>>", "");
+        });
+        assertEquals("Parse error: Invalid token DOLLAR. Token types [ EOF, MINUS, PLUS, RB ] expected at pos=6", exception.getMessage());
     }
 }

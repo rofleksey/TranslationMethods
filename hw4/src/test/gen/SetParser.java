@@ -160,7 +160,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR", lex);
         }
     }
 
@@ -171,7 +171,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PERCENT ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "PERCENT", lex);
         }
     }
 
@@ -182,7 +182,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PLUS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "PLUS", lex);
         }
     }
 
@@ -193,7 +193,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ MINUS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "MINUS", lex);
         }
     }
 
@@ -204,7 +204,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "LB", lex);
         }
     }
 
@@ -215,7 +215,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "RB", lex);
         }
     }
 
@@ -226,7 +226,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "LS", lex);
         }
     }
 
@@ -237,7 +237,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "RS", lex);
         }
     }
 
@@ -248,7 +248,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ COMMA ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "COMMA", lex);
         }
     }
 
@@ -259,7 +259,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LETTER ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "LETTER", lex);
         }
     }
 
@@ -282,7 +282,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR, LB, LETTER, LS", lex);
         }
     }
 
@@ -317,7 +317,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, MINUS, PLUS, RB ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "EOF, MINUS, PLUS, RB", lex);
         }
     }
 
@@ -346,7 +346,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR, LB, LETTER, LS", lex);
         }
     }
 
@@ -384,7 +384,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LETTER, LS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR, LETTER, LS", lex);
         }
     }
 
@@ -406,7 +406,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LETTER ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "LETTER", lex);
         }
     }
 
@@ -433,7 +433,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ COMMA, RS ] expected", lex.lastPos());
+                throw new SetLexer.ParseException(lex.curToken().type, "COMMA, RS", lex);
         }
     }
 

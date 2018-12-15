@@ -325,5 +325,9 @@ public class ArithmeticLexer {
         ParseException(String cause, int at) {
             super("Parse error: " + cause + " at pos=" + (at + 1));
         }
+
+        ParseException(TokenType type, String expected, ArithmeticLexer lex) {
+            this("Invalid token " + type + ". Token types [ " + expected + " ] expected", type != TokenType.EOF ? lex.lastPos() : lex.curPos() + 1);
+        }
     }
 }

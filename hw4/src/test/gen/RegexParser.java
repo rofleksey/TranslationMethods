@@ -165,7 +165,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "LB", lex);
         }
     }
 
@@ -176,7 +176,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "RB", lex);
         }
     }
 
@@ -187,7 +187,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ OR ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "OR", lex);
         }
     }
 
@@ -198,7 +198,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ STAR ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "STAR", lex);
         }
     }
 
@@ -209,7 +209,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "C", lex);
         }
     }
 
@@ -233,7 +233,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
         }
     }
 
@@ -256,7 +256,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
         }
     }
 
@@ -279,7 +279,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
         }
     }
 
@@ -306,7 +306,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
         }
     }
 
@@ -333,7 +333,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, OR, RB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "EOF, OR, RB", lex);
         }
     }
 
@@ -361,7 +361,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, C, LB, OR, RB ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "EOF, C, LB, OR, RB", lex);
         }
     }
 
@@ -386,7 +386,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, C, LB, OR, RB, STAR ] expected", lex.lastPos());
+                throw new RegexLexer.ParseException(lex.curToken().type, "EOF, C, LB, OR, RB, STAR", lex);
         }
     }
 

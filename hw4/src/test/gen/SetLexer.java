@@ -27,14 +27,14 @@ public class SetLexer {
         EOF_TOKEN = new Token(TokenType.EOF, "<EOF>");
         tokenTextBuilder = new StringBuilder();
 
-        trie.add("$", TokenType.DOLLAR);
+        trie.add("$all", TokenType.DOLLAR);
         trie.add("%", TokenType.PERCENT);
         trie.add("+", TokenType.PLUS);
         trie.add("-", TokenType.MINUS);
         trie.add("(", TokenType.LB);
         trie.add(")", TokenType.RB);
-        trie.add("<", TokenType.LS);
-        trie.add(">", TokenType.RS);
+        trie.add("<<", TokenType.LS);
+        trie.add(">>", TokenType.RS);
         trie.add(",", TokenType.COMMA);
         AutomataState state2 = new AutomataState(TokenType.LETTER);
         AutomataArrow arrow2 = new AutomataArrow(it -> 'a' <= it && it <= 'z', state2);
@@ -328,6 +328,10 @@ public class SetLexer {
     public static class ParseException extends Exception {
         ParseException(String cause, int at) {
             super("Parse error: " + cause + " at pos=" + (at + 1));
+        }
+
+        ParseException(TokenType type, String expected, SetLexer lex) {
+            this("Invalid token " + type + ". Token types [ " + expected + " ] expected", type != TokenType.EOF ? lex.lastPos() : lex.curPos() + 1);
         }
     }
 }

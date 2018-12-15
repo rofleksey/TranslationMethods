@@ -6,6 +6,6 @@
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new %classnameLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ %upName ] expected", lex.lastPos());
+                throw new %classnameLexer.ParseException(lex.curToken().type, "%upName", lex);
         }
     }

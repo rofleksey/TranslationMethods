@@ -324,5 +324,9 @@ public class RegexLexer {
         ParseException(String cause, int at) {
             super("Parse error: " + cause + " at pos=" + (at + 1));
         }
+
+        ParseException(TokenType type, String expected, RegexLexer lex) {
+            this("Invalid token " + type + ". Token types [ " + expected + " ] expected", type != TokenType.EOF ? lex.lastPos() : lex.curPos() + 1);
+        }
     }
 }
