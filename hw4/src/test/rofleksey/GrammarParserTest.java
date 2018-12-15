@@ -27,6 +27,12 @@ class GrammarParserTest {
     }
 
     @Test
+    void testSets() throws IOException {
+        Grammar g = GrammarParser.fromString(getFileContents("sets.rofl"));
+        logGrammar(g);
+    }
+
+    @Test
     void testRegex() throws IOException {
         Grammar g = GrammarParser.fromString(getFileContents("regex.rofl"));
         logGrammar(g);

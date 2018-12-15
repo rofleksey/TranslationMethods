@@ -6,8 +6,25 @@ public class Grammar {
     public static final String EPSILON = "ϵ", EOF = "$";
     ArrayList<ParserRule> pRules = new ArrayList<>();
     ArrayList<LRuleItem> lRules = new ArrayList<>();
+    private HashMap<String, String> options = new HashMap<>();
     HashMap<String, ParserRule> ruleNames;
 
+    Grammar() {
+        addOption("headers", "\n");
+        addOption("members", "\n");
+    }
+
+    void addOption(String name, String content) {
+        options.put(name, content);
+    }
+
+    boolean hasOption(String name) {
+        return options.containsKey(name);
+    }
+
+    String getOption(String name) {
+        return options.get(name);
+    }
 
     @Override
     public String toString() {

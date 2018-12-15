@@ -1,4 +1,4 @@
-package rofleksey;
+package gen;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,10 +9,9 @@ import java.util.function.Predicate;
 
 public class ArithmeticLexer {
     public enum TokenType {
-        NUM, MULT, PLUS, LB, RB,
+        NUM, MULT, PLUS, LB, RB, 
         EOF
     }
-
     private Token EOF_TOKEN;
     private final Reader reader;
     private Token curToken;
@@ -28,10 +27,10 @@ public class ArithmeticLexer {
         EOF_TOKEN = new Token(TokenType.EOF, "<EOF>");
         tokenTextBuilder = new StringBuilder();
 
-        AutomataState state1 = new AutomataState(TokenType.NUM);
-        AutomataArrow arrow1 = new AutomataArrow(Character::isDigit, state1);
-        state1.addArrow(arrow1);
-        dfa.getRoot().addArrow(arrow1);
+        AutomataState state0 = new AutomataState(TokenType.NUM);
+        AutomataArrow arrow0 = new AutomataArrow(Character::isDigit, state0);
+        state0.addArrow(arrow0);
+        dfa.getRoot().addArrow(arrow0);
         trie.add("*", TokenType.MULT);
         trie.add("+", TokenType.PLUS);
         trie.add("(", TokenType.LB);
@@ -141,7 +140,6 @@ public class ArithmeticLexer {
     private static class AutomataArrow {
         private final Predicate<Character> predicate;
         private final AutomataState next;
-
         AutomataArrow(Predicate<Character> predicate, AutomataState next) {
             this.predicate = predicate;
             this.next = next;

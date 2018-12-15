@@ -16,23 +16,40 @@ anyRule
 rules
     : pRule
     | lRule
+    | optionsRule
+    ;
+
+optionsRule
+    :   Dollar name=Identifier ReverseArrow (content=String | content=MultilineString)
     ;
 
 pRule //'parserRule' conflicts with internal names, had to choose this one
-    : name=Identifier Arrow fields=fieldsDeclaration? Newline list=branchList
+    : name=Identifier Arrow funcFields=funcFieldsDeclaration? fields=localFieldsDeclaration? initCode=Code? Newline list=branchList
     ;
 
-fieldsDeclaration
-    : '[' list=pFieldList ']'
-    | '[' ']'
+funcFieldsDeclaration
+    : '(' list=funcFieldList ')'
     ;
 
-pFieldList
-    : f=pField
-    | pFieldList ';' f=pField
+localFieldsDeclaration
+    : '[' list=localFieldList ']'
     ;
 
-pField
+localFieldList
+    : f=localField
+    | localFieldList ';' f=localField
+    ;
+
+localField
+    : type=Identifier name=Identifier
+    ;
+
+funcFieldList
+    : f=funcField
+    | funcFieldList ';' f=funcField
+    ;
+
+funcField
     : type=Identifier name=Identifier
     ;
 
@@ -42,7 +59,7 @@ branchList
     ;
 
 branch
-    :  list=pItemList code=Code?
+    :  code=Code? list=pItemList
     ;
 
 pItemList
@@ -51,8 +68,13 @@ pItemList
     ;
 
 pItem
-    :  (name=Identifier '=')? content=Identifier
-    | At
+    :  (name=Identifier '=')? content=Identifier ('(' list=argList ')')? code=Code?
+    | At code=Code?
+    ;
+
+argList
+    : name=Identifier
+    | argList ',' name=Identifier
     ;
 
 lRule locals [boolean special]
@@ -60,9 +82,11 @@ lRule locals [boolean special]
     ;
 
 Arrow: '->';
+ReverseArrow: '<-';
 Semi: ';';
 Assign: '=';
 At: '@';
+Dollar : '$';
 Flex: ':=';
 LeftParen : '(';
 RightParen : ')';
@@ -70,6 +94,8 @@ LeftBracket : '[';
 RightBracket : ']';
 LeftBrace : '{';
 RightBrace : '}';
+
+
 
 
 Identifier
@@ -85,7 +111,7 @@ IdentifierNondigit
     ;
 fragment
 Nondigit
-    : [a-zA-Z_]
+    : [a-zA-Z_<>.]
     ;
 
 fragment
@@ -93,6 +119,10 @@ Digit
     :   [0-9]
     ;
 
+
+MultilineString
+    : '"' ~["]*  '"'
+    ;
 
 String
     : '\'' ~[\r\n']*  '\''

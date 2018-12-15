@@ -4,12 +4,25 @@ import java.util.ArrayList;
 
 public class Branch {
     private static int globalNum = 0;
-    String code;
+    private String initCode;
+    ParserRule parent;
     int num = globalNum++;
     ArrayList<PRuleItem> items = new ArrayList<>();
 
-    String getNormalCode() {
-        return code.substring(1, code.length() - 1);
+    Branch(ParserRule parent) {
+        this.parent = parent;
+    }
+
+    void setInitCode(String code) {
+        initCode = code;
+    }
+
+    boolean hasCode() {
+        return initCode != null;
+    }
+
+    String getInitCode() {
+        return initCode == null ? null : initCode.substring(1, initCode.length() - 1).replace("$", "result");
     }
 
     @Override

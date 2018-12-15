@@ -1,7 +1,9 @@
-package rofleksey;
+package gen;
+
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ArithmeticParser {
@@ -9,48 +11,73 @@ public class ArithmeticParser {
 
     public static class Tree {
         private final String name;
-        private final Tree[] children;
+        private final ArrayList<Tree> children;
         private Object userData;
+        boolean isTerminal;
 
-        private Tree(String name, Tree... children) {
+        private Tree(String name) {
             this.name = name;
-            this.children = children;
+            children = new ArrayList<>();
         }
 
+        void add(Tree... trees) {
+            children.addAll(Arrays.asList(trees));
+        }
+
+        private void getText(StringBuilder builder) {
+            if (isTerminal) {
+                builder.append(name);
+            } else {
+                for (Tree t : children) {
+                    t.getText(builder);
+                }
+            }
+        }
+
+        public String getText() {
+            if (isTerminal) {
+                return name;
+            } else {
+                StringBuilder builder = new StringBuilder();
+                getText(builder);
+                return builder.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
         public String getName() {
             return name;
         }
 
-        public Tree[] getChildren() {
+        public ArrayList<Tree> getChildren() {
             return children;
         }
-
         public void setUserData(Object o) {
             userData = o;
         }
-
         public Object getUserData() {
             return userData;
         }
-
         @Override
         public String toString() {
-            return children.length == 0 ? name : "<" + name + ": " + Arrays.toString(children) + ">";
+            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
         }
     }
 
     public static class TerminalContext extends Tree {
         private final ArithmeticLexer.Token token;
-
         private TerminalContext(ArithmeticLexer.Token token) {
             super(token.text);
             this.token = token;
+            isTerminal = true;
         }
-
         public ArithmeticLexer.Token getToken() {
             return token;
         }
     }
+
 
     public static class EContext extends Tree {
         public int num;
@@ -58,14 +85,9 @@ public class ArithmeticParser {
         public E1Context e2;
 
 
-        private EContext(Tree... children) {
-            super("E", children);
+        private EContext() {
+            super("E");
         }
-
-        private void calc11() {
-            num = e1.num + e2.num;
-        }
-
     }
 
     public static class E1Context extends Tree {
@@ -74,18 +96,9 @@ public class ArithmeticParser {
         public E1Context e2;
 
 
-        private E1Context(Tree... children) {
-            super("E1", children);
+        private E1Context() {
+            super("E1");
         }
-
-        private void calc12() {
-            num = e1.num + e2.num;
-        }
-
-        private void calc13() {
-            num = 0;
-        }
-
     }
 
     public static class TContext extends Tree {
@@ -94,14 +107,9 @@ public class ArithmeticParser {
         public T1Context e2;
 
 
-        private TContext(Tree... children) {
-            super("T", children);
+        private TContext() {
+            super("T");
         }
-
-        private void calc14() {
-            num = e1.num * e2.num;
-        }
-
     }
 
     public static class T1Context extends Tree {
@@ -110,18 +118,9 @@ public class ArithmeticParser {
         public T1Context e2;
 
 
-        private T1Context(Tree... children) {
-            super("T1", children);
+        private T1Context() {
+            super("T1");
         }
-
-        private void calc15() {
-            num = e1.num * e2.num;
-        }
-
-        private void calc16() {
-            num = 1;
-        }
-
     }
 
     public static class FContext extends Tree {
@@ -130,18 +129,9 @@ public class ArithmeticParser {
         public EContext e1;
 
 
-        private FContext(Tree... children) {
-            super("F", children);
+        private FContext() {
+            super("F");
         }
-
-        private void calc17() {
-            num = e.getToken().toInt();
-        }
-
-        private void calc18() {
-            num = e1.num;
-        }
-
     }
 
 
@@ -202,16 +192,18 @@ public class ArithmeticParser {
 
 
     private EContext E() throws ArithmeticLexer.ParseException {
-        EContext result;
+        EContext result = new EContext();
+
+
         switch (lex.curToken().type) {
             case LB:
             case NUM: {
-                TContext c1 = T();
-                E1Context c2 = E1();
-                result = new EContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc11();
+                TContext e1 = T();
+                E1Context e2 = E1();
+                result.num = e1.num + e2.num;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -221,22 +213,23 @@ public class ArithmeticParser {
     }
 
     private E1Context E1() throws ArithmeticLexer.ParseException {
-        E1Context result;
+        E1Context result = new E1Context();
+
+
         switch (lex.curToken().type) {
             case PLUS: {
                 TerminalContext c1 = PLUS();
-                TContext c2 = T();
-                E1Context c3 = E1();
-                result = new E1Context(c1, c2, c3);
-                result.e1 = c2;
-                result.e2 = c3;
-                result.calc12();
+                TContext e1 = T();
+                E1Context e2 = E1();
+                result.num = e1.num + e2.num;
+                result.add(c1, e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
             case EOF:
             case RB: {
-                result = new E1Context();
-                result.calc13();
+                result.num = 0;
                 return result;
             }
 
@@ -246,16 +239,18 @@ public class ArithmeticParser {
     }
 
     private TContext T() throws ArithmeticLexer.ParseException {
-        TContext result;
+        TContext result = new TContext();
+
+
         switch (lex.curToken().type) {
             case LB:
             case NUM: {
-                FContext c1 = F();
-                T1Context c2 = T1();
-                result = new TContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc14();
+                FContext e1 = F();
+                T1Context e2 = T1();
+                result.num = e1.num * e2.num;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -265,23 +260,24 @@ public class ArithmeticParser {
     }
 
     private T1Context T1() throws ArithmeticLexer.ParseException {
-        T1Context result;
+        T1Context result = new T1Context();
+
+
         switch (lex.curToken().type) {
+            case MULT: {
+                TerminalContext c1 = MULT();
+                FContext e1 = F();
+                T1Context e2 = T1();
+                result.num = e1.num * e2.num;
+                result.add(c1, e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
+                return result;
+            }
             case EOF:
             case PLUS:
             case RB: {
-                result = new T1Context();
-                result.calc16();
-                return result;
-            }
-            case MULT: {
-                TerminalContext c1 = MULT();
-                FContext c2 = F();
-                T1Context c3 = T1();
-                result = new T1Context(c1, c2, c3);
-                result.e1 = c2;
-                result.e2 = c3;
-                result.calc15();
+                result.num = 1;
                 return result;
             }
 
@@ -291,22 +287,24 @@ public class ArithmeticParser {
     }
 
     private FContext F() throws ArithmeticLexer.ParseException {
-        FContext result;
+        FContext result = new FContext();
+
+
         switch (lex.curToken().type) {
             case NUM: {
-                TerminalContext c1 = NUM();
-                result = new FContext(c1);
-                result.e = c1;
-                result.calc17();
+                TerminalContext e = NUM();
+                result.num = e.getToken().toInt();
+                result.add(e);
+                result.e = e;
                 return result;
             }
             case LB: {
                 TerminalContext c1 = LB();
-                EContext c2 = E();
+                EContext e1 = E();
                 TerminalContext c3 = RB();
-                result = new FContext(c1, c2, c3);
-                result.e1 = c2;
-                result.calc18();
+                result.num = e1.num;
+                result.add(c1, e1, c3);
+                result.e1 = e1;
                 return result;
             }
 

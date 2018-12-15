@@ -1,5 +1,6 @@
 package rofleksey;
 
+import gen.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,5 +33,13 @@ class ResultTest {
         RegexParser.RContext tree = parser.parse(test);
         Assertions.assertEquals(2, tree.stars);
         Assertions.assertEquals(3, tree.ors);
+    }
+
+    @Test
+    void testSets() throws SetLexer.ParseException {
+        SetParser parser = new SetParser();
+        String test = "$-a%y+($-($-<a, d, e>) + <e>)+x%x";
+        SetParser.ExprContext tree = parser.parse(test);
+        Assertions.assertEquals("[a, d, e, x, z]", tree.set.toString());
     }
 }

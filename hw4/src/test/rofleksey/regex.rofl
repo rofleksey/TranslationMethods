@@ -1,26 +1,26 @@
 R -> [int ors; int stars]
-    e1=D e2=RFlex {ors = e1.ors + e2.ors; stars = e1.stars + e2.stars;}
+    e1=D e2=RFlex {$.ors = e1.ors + e2.ors; $.stars = e1.stars + e2.stars;}
 
 D -> [int ors; int stars]
-    e1=S e2=DFlex {ors = e1.ors + e2.ors; stars = e1.stars + e2.stars;}
+    e1=S e2=DFlex {$.ors = e1.ors + e2.ors; $.stars = e1.stars + e2.stars;}
 
 S -> [int ors; int stars]
-    e1=G e2=SFlex {ors = e1.ors + e2.ors; stars = e1.stars + e2.stars;}
+    e1=G e2=SFlex {$.ors = e1.ors + e2.ors; $.stars = e1.stars + e2.stars;}
 
 G -> [int ors; int stars]
     c
-    lb e1=R rb {ors = e1.ors; stars = e1.stars;}
+    lb e1=R rb {$.ors = e1.ors; $.stars = e1.stars;}
 
 RFlex -> [int ors; int stars]
-    or e1=D e2=RFlex {ors = e1.ors + e2.ors + 1; stars = e1.stars + e2.stars;}
+    or e1=D e2=RFlex {$.ors = e1.ors + e2.ors + 1; $.stars = e1.stars + e2.stars;}
     @
 
 DFlex -> [int ors; int stars]
-    e1=S e2=DFlex {ors = e1.ors + e2.ors; stars = e1.stars + e2.stars;}
+    e1=S e2=DFlex {$.ors = e1.ors + e2.ors; $.stars = e1.stars + e2.stars;}
     @
 
 SFlex -> [int ors; int stars]
-    star {stars = 1;}
+    star {$.stars = 1;}
     @
 
 lb := '('

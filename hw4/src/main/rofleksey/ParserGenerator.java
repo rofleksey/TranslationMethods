@@ -102,34 +102,38 @@ public class ParserGenerator {
             s = s.replace("%package", "package " + pkg + ";");
         }
 
+        s = s
+                .replace("%headers", grammar.getOption("headers"))
+                .replace("%members", grammar.getOption("members"));
+
         {
             StringBuilder contexts = new StringBuilder();
             for (ParserRule rule : grammar.pRules) {
                 String curContext = contextTemplate.replace("%name", rule.name);
                 curContext = curContext.replace("%upName", rule.contextName);
                 StringBuilder curFields = new StringBuilder();
-                for (Pair<String, String> field : rule.fields) {
+                for (Pair<String, String> field : rule.localFields) {
                     indent(curFields, 2);
                     curFields.append("public ").append(field.getA()).append(" ").append(field.getB()).append(";\n");
                 }
-                ArrayList<Pair<String, String>> inlineFields = new ArrayList<>();
+                TreeMap<String, String> inlineFields = new TreeMap<>();
                 for (Branch branch : rule.branches) {
                     for (PRuleItem item : branch.items) {
                         if (item.name != null) {
                             if (grammar.ruleNames.containsKey(item.content)) {
-                                inlineFields.add(new Pair<>(capitalize(item.content) + "Context", item.name));
+                                inlineFields.put(item.name, capitalize(item.content) + "Context");
                             } else {
-                                inlineFields.add(new Pair<>("TerminalContext", item.name));
+                                inlineFields.put(item.name, "TerminalContext");
                             }
                         }
                     }
                 }
-                for (Pair<String, String> field : inlineFields) {
+                for (Map.Entry<String, String> field : inlineFields.entrySet()) {
                     indent(curFields, 2);
-                    curFields.append("public ").append(field.getA()).append(" ").append(field.getB()).append(";\n");
+                    curFields.append("public ").append(field.getValue()).append(" ").append(field.getKey()).append(";\n");
                 }
                 curContext = curContext.replace("%fields", curFields.toString());
-                StringBuilder curCalcs = new StringBuilder();
+                /*StringBuilder curCalcs = new StringBuilder();
                 for (Branch branch : rule.branches) {
                     if (branch.code != null) {
                         indent(curCalcs, 2);
@@ -140,7 +144,7 @@ public class ParserGenerator {
                         curCalcs.append("}\n");
                     }
                 }
-                curContext = curContext.replace("%calc", curCalcs.toString());
+                curContext = curContext.replace("%calc", curCalcs.toString());*/
                 contexts.append(curContext);
             }
             s = s.replace("%contexts", contexts.toString());
@@ -162,6 +166,23 @@ public class ParserGenerator {
                 String curBuilder = builderTemplate.replace("%classname", className)
                         .replace("%name", rule.name)
                         .replace("%upName", rule.contextName);
+                {
+                    StringJoiner argsJoiner = new StringJoiner(",");
+                    for (Pair<String, String> farg : rule.funcFields) {
+                        argsJoiner.add(farg.getA() + " " + farg.getB());
+                    }
+                    curBuilder = curBuilder.replace("%args", argsJoiner.toString());
+                }
+
+                if (rule.hasInitCode()) {
+                    StringBuilder initCode = new StringBuilder();
+                    indent(initCode, 2);
+                    initCode.append(rule.getInitCode()).append(";\n");
+                    curBuilder = curBuilder.replace("%initCode", initCode.toString());
+                } else {
+                    curBuilder = curBuilder.replace("%initCode", "\n");
+                }
+
                 Map<String, ArrayList<Branch>> row = table.getX(rule.name);
                 int numOfBranches = row.values().stream().mapToInt(ArrayList::size).sum();
                 Map<Branch, ArrayList<String>> inverse = new HashMap<>(numOfBranches + 1, 1);
@@ -187,38 +208,56 @@ public class ParserGenerator {
                         cases.append("\n");
                         expected.add(name);
                     }
+                    if (entry.getKey().hasCode()) {
+                        indent(cases, 4);
+                        cases.append(entry.getKey().getInitCode()).append(";\n");
+                    }
                     int cI = 1;
-                    Map<String, Integer> fieldMap = new HashMap<>(entry.getKey().items.size() + 1, 1);
+                    ArrayList<String> itemsArr = new ArrayList<>(entry.getKey().items.size() + 1);
+                    ArrayList<String> assignArr = new ArrayList<>(entry.getKey().items.size() + 1);
                     for (PRuleItem item : entry.getKey().items) {
                         if (!item.content.equals(Grammar.EPSILON)) {
                             indent(cases, 4);
+                            //.append(cI).append(" = ").append(item.content).append("();\n");
                             if (grammar.ruleNames.containsKey(item.content)) {
-                                cases.append(capitalize(item.content)).append("Context c").append(cI).append(" = ").append(item.content).append("();\n");
+                                cases.append(capitalize(item.content)).append("Context ");
                             } else {
-                                cases.append("TerminalContext c").append(cI).append(" = ").append(item.content).append("();\n");
+                                cases.append("TerminalContext ");
                             }
-                            if (item.name != null) {
-                                fieldMap.put(item.name, cI);
+                            if (item.name == null) {
+                                cases.append("c").append(cI);
+                                itemsArr.add("c" + cI);
+                            } else {
+                                cases.append(item.name);
+                                itemsArr.add(item.name);
+                                assignArr.add(item.name);
                             }
+                            cases.append(" = ").append(item.content).append("(");
+                            if (!item.arguments.isEmpty()) {
+                                cases.append(item.arguments.get(0));
+                                for (int i = 1; i < item.arguments.size(); i++) {
+                                    cases.append(", ").append(item.arguments.get(i));
+                                }
+                            }
+                            cases.append(");\n");
                             cI++;
                         }
-                    }
-                    indent(cases, 4);
-                    cases.append("result = new ").append(rule.contextName).append("Context(");
-                    if (cI > 1) {
-                        cases.append("c1");
-                        for (int i = 2; i < cI; i++) {
-                            cases.append(", ").append("c").append(Integer.toString(i));
+                        if (item.hasCode()) {
+                            indent(cases, 4);
+                            cases.append(item.getCode()).append(";\n");
                         }
                     }
-                    cases.append(");\n");
-                    for (Map.Entry<String, Integer> ff : fieldMap.entrySet()) {
+                    if (!itemsArr.isEmpty()) {
                         indent(cases, 4);
-                        cases.append("result.").append(ff.getKey()).append(" = c").append(Integer.toString(ff.getValue())).append(";\n");
+                        cases.append("result.add(").append(itemsArr.get(0));
+                        for (int i = 1; i < itemsArr.size(); i++) {
+                            cases.append(", ").append(itemsArr.get(i));
+                        }
+                        cases.append(");\n");
                     }
-                    if (entry.getKey().code != null) {
+                    for (String assignName : assignArr) {
                         indent(cases, 4);
-                        cases.append("result.calc").append(Integer.toString(entry.getKey().num)).append("();\n");
+                        cases.append("result.").append(assignName).append(" = ").append(assignName).append(";\n");
                     }
                     indent(cases, 4);
                     cases.append("return result;\n");

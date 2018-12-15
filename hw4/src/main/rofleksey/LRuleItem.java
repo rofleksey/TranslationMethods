@@ -77,6 +77,11 @@ public class LRuleItem {
                             .stateArrow("Character::isLetter", 0)
                             .addToRoot(0).build();
 
+                case "lowAlpha":
+                    return new LBuilder().stateDef("TokenType." + upperCaseName)
+                            .stateArrow("it -> 'a' <= it && it <= 'z'", 0)
+                            .addToRoot(0).build();
+
                 case "word":
                     return new LBuilder().stateDef("TokenType." + upperCaseName)
                             .stateArrow("Character::isLetter", 0)

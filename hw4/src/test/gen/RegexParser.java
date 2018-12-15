@@ -1,7 +1,9 @@
-package rofleksey;
+package gen;
+
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RegexParser {
@@ -9,48 +11,73 @@ public class RegexParser {
 
     public static class Tree {
         private final String name;
-        private final Tree[] children;
+        private final ArrayList<Tree> children;
         private Object userData;
+        boolean isTerminal;
 
-        private Tree(String name, Tree... children) {
+        private Tree(String name) {
             this.name = name;
-            this.children = children;
+            children = new ArrayList<>();
         }
 
+        void add(Tree... trees) {
+            children.addAll(Arrays.asList(trees));
+        }
+
+        private void getText(StringBuilder builder) {
+            if (isTerminal) {
+                builder.append(name);
+            } else {
+                for (Tree t : children) {
+                    t.getText(builder);
+                }
+            }
+        }
+
+        public String getText() {
+            if (isTerminal) {
+                return name;
+            } else {
+                StringBuilder builder = new StringBuilder();
+                getText(builder);
+                return builder.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
         public String getName() {
             return name;
         }
 
-        public Tree[] getChildren() {
+        public ArrayList<Tree> getChildren() {
             return children;
         }
-
         public void setUserData(Object o) {
             userData = o;
         }
-
         public Object getUserData() {
             return userData;
         }
-
         @Override
         public String toString() {
-            return children.length == 0 ? name : "<" + name + ": " + Arrays.toString(children) + ">";
+            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
         }
     }
 
     public static class TerminalContext extends Tree {
         private final RegexLexer.Token token;
-
         private TerminalContext(RegexLexer.Token token) {
             super(token.text);
             this.token = token;
+            isTerminal = true;
         }
-
         public RegexLexer.Token getToken() {
             return token;
         }
     }
+
 
     public static class RContext extends Tree {
         public int ors;
@@ -59,16 +86,9 @@ public class RegexParser {
         public RFlexContext e2;
 
 
-        private RContext(Tree... children) {
-            super("R", children);
+        private RContext() {
+            super("R");
         }
-
-        private void calc0() {
-            ors = e1.ors + e2.ors;
-            stars = e1.stars + e2.stars;
-            ;
-        }
-
     }
 
     public static class DContext extends Tree {
@@ -78,16 +98,9 @@ public class RegexParser {
         public DFlexContext e2;
 
 
-        private DContext(Tree... children) {
-            super("D", children);
+        private DContext() {
+            super("D");
         }
-
-        private void calc1() {
-            ors = e1.ors + e2.ors;
-            stars = e1.stars + e2.stars;
-            ;
-        }
-
     }
 
     public static class SContext extends Tree {
@@ -97,16 +110,9 @@ public class RegexParser {
         public SFlexContext e2;
 
 
-        private SContext(Tree... children) {
-            super("S", children);
+        private SContext() {
+            super("S");
         }
-
-        private void calc2() {
-            ors = e1.ors + e2.ors;
-            stars = e1.stars + e2.stars;
-            ;
-        }
-
     }
 
     public static class GContext extends Tree {
@@ -115,16 +121,9 @@ public class RegexParser {
         public RContext e1;
 
 
-        private GContext(Tree... children) {
-            super("G", children);
+        private GContext() {
+            super("G");
         }
-
-        private void calc4() {
-            ors = e1.ors;
-            stars = e1.stars;
-            ;
-        }
-
     }
 
     public static class RFlexContext extends Tree {
@@ -134,16 +133,9 @@ public class RegexParser {
         public RFlexContext e2;
 
 
-        private RFlexContext(Tree... children) {
-            super("RFlex", children);
+        private RFlexContext() {
+            super("RFlex");
         }
-
-        private void calc5() {
-            ors = e1.ors + e2.ors + 1;
-            stars = e1.stars + e2.stars;
-            ;
-        }
-
     }
 
     public static class DFlexContext extends Tree {
@@ -153,16 +145,9 @@ public class RegexParser {
         public DFlexContext e2;
 
 
-        private DFlexContext(Tree... children) {
-            super("DFlex", children);
+        private DFlexContext() {
+            super("DFlex");
         }
-
-        private void calc7() {
-            ors = e1.ors + e2.ors;
-            stars = e1.stars + e2.stars;
-            ;
-        }
-
     }
 
     public static class SFlexContext extends Tree {
@@ -170,15 +155,9 @@ public class RegexParser {
         public int stars;
 
 
-        private SFlexContext(Tree... children) {
-            super("SFlex", children);
+        private SFlexContext() {
+            super("SFlex");
         }
-
-        private void calc9() {
-            stars = 1;
-            ;
-        }
-
     }
 
 
@@ -239,16 +218,20 @@ public class RegexParser {
 
 
     private RContext R() throws RegexLexer.ParseException {
-        RContext result;
+        RContext result = new RContext();
+
+
         switch (lex.curToken().type) {
             case C:
             case LB: {
-                DContext c1 = D();
-                RFlexContext c2 = RFlex();
-                result = new RContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc0();
+                DContext e1 = D();
+                RFlexContext e2 = RFlex();
+                result.ors = e1.ors + e2.ors;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -258,16 +241,20 @@ public class RegexParser {
     }
 
     private DContext D() throws RegexLexer.ParseException {
-        DContext result;
+        DContext result = new DContext();
+
+
         switch (lex.curToken().type) {
             case C:
             case LB: {
-                SContext c1 = S();
-                DFlexContext c2 = DFlex();
-                result = new DContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc1();
+                SContext e1 = S();
+                DFlexContext e2 = DFlex();
+                result.ors = e1.ors + e2.ors;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -277,16 +264,20 @@ public class RegexParser {
     }
 
     private SContext S() throws RegexLexer.ParseException {
-        SContext result;
+        SContext result = new SContext();
+
+
         switch (lex.curToken().type) {
             case C:
             case LB: {
-                GContext c1 = G();
-                SFlexContext c2 = SFlex();
-                result = new SContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc2();
+                GContext e1 = G();
+                SFlexContext e2 = SFlex();
+                result.ors = e1.ors + e2.ors;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -296,20 +287,24 @@ public class RegexParser {
     }
 
     private GContext G() throws RegexLexer.ParseException {
-        GContext result;
+        GContext result = new GContext();
+
+
         switch (lex.curToken().type) {
             case LB: {
                 TerminalContext c1 = lb();
-                RContext c2 = R();
+                RContext e1 = R();
                 TerminalContext c3 = rb();
-                result = new GContext(c1, c2, c3);
-                result.e1 = c2;
-                result.calc4();
+                result.ors = e1.ors;
+                result.stars = e1.stars;
+                ;
+                result.add(c1, e1, c3);
+                result.e1 = e1;
                 return result;
             }
             case C: {
                 TerminalContext c1 = c();
-                result = new GContext(c1);
+                result.add(c1);
                 return result;
             }
 
@@ -319,21 +314,24 @@ public class RegexParser {
     }
 
     private RFlexContext RFlex() throws RegexLexer.ParseException {
-        RFlexContext result;
+        RFlexContext result = new RFlexContext();
+
+
         switch (lex.curToken().type) {
             case OR: {
                 TerminalContext c1 = or();
-                DContext c2 = D();
-                RFlexContext c3 = RFlex();
-                result = new RFlexContext(c1, c2, c3);
-                result.e1 = c2;
-                result.e2 = c3;
-                result.calc5();
+                DContext e1 = D();
+                RFlexContext e2 = RFlex();
+                result.ors = e1.ors + e2.ors + 1;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(c1, e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
             case EOF:
             case RB: {
-                result = new RFlexContext();
                 return result;
             }
 
@@ -343,22 +341,25 @@ public class RegexParser {
     }
 
     private DFlexContext DFlex() throws RegexLexer.ParseException {
-        DFlexContext result;
+        DFlexContext result = new DFlexContext();
+
+
         switch (lex.curToken().type) {
             case EOF:
             case OR:
             case RB: {
-                result = new DFlexContext();
                 return result;
             }
             case C:
             case LB: {
-                SContext c1 = S();
-                DFlexContext c2 = DFlex();
-                result = new DFlexContext(c1, c2);
-                result.e1 = c1;
-                result.e2 = c2;
-                result.calc7();
+                SContext e1 = S();
+                DFlexContext e2 = DFlex();
+                result.ors = e1.ors + e2.ors;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
                 return result;
             }
 
@@ -368,12 +369,15 @@ public class RegexParser {
     }
 
     private SFlexContext SFlex() throws RegexLexer.ParseException {
-        SFlexContext result;
+        SFlexContext result = new SFlexContext();
+
+
         switch (lex.curToken().type) {
             case STAR: {
                 TerminalContext c1 = star();
-                result = new SFlexContext(c1);
-                result.calc9();
+                result.stars = 1;
+                ;
+                result.add(c1);
                 return result;
             }
             case EOF:
@@ -381,7 +385,6 @@ public class RegexParser {
             case LB:
             case OR:
             case RB: {
-                result = new SFlexContext();
                 return result;
             }
 

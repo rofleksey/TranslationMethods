@@ -1,6 +1,7 @@
 
-    private %upNameContext %name() throws %classnameLexer.ParseException {
-        %upNameContext result;
+    private %upNameContext %name(%args) throws %classnameLexer.ParseException {
+        %upNameContext result = new %upNameContext();
+%initCode
         switch (lex.curToken().type) {
 %cases
             default:

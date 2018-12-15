@@ -1,0 +1,50 @@
+$headers <- 'import java.util.Set;'
+$headers <- 'import java.util.HashSet;'
+$members <- "
+    Set<String> createFullSet() {
+        return createRange('a', 'z');
+    }
+
+    Set<String> createRange(char from, char to) {
+        HashSet<String> set = new HashSet<>();
+        for(char c = from; c <= to; c++) {
+            set.add(Character.toString(c));
+        }
+        return set;
+    }
+"
+
+expr -> [Set<String> set] {System.out.println("expr")}
+    s=setObj exprFlex(s.set) {$.set = s.set}
+
+exprFlex -> (Set<String> parentSet)
+    {System.out.println("+")} PLUS s=setObj {parentSet.addAll(s.set)} exprFlex(parentSet)
+    {System.out.println("-")} MINUS s=setObj {parentSet.removeAll(s.set)} exprFlex(parentSet)
+    @
+
+setObj -> [Set<String> set]
+    e=setDef {$.set = e.set}
+    LB e1=expr RB {$.set = e1.set}
+
+setDef -> [Set<String> set]
+    LS e=setList RS {$.set = e.set}
+    l1=LETTER PERCENT l2=LETTER {$.set = createRange(l1.getText().charAt(0), l2.getText().charAt(0)); System.out.println($.set)}
+    DOLLAR {$.set = createFullSet(); System.out.println($.set)}
+
+setList -> [Set<String> set]
+    e1=LETTER e2=setListFlex {$.set = e2.set; $.set.add(e1.getText());}
+
+setListFlex -> [Set<String> set]
+    COMMA e1=LETTER e2=setListFlex {$.set = e2.set; $.set.add(e1.getText());}
+    @ {$.set = new HashSet<>()}
+
+DOLLAR := '$'
+PERCENT := '%'
+PLUS := '+'
+MINUS := '-'
+LB := '('
+RB := ')'
+LS := '<'
+RS := '>'
+COMMA := ','
+LETTER := @lowAlpha

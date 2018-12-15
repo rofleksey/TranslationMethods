@@ -1,4 +1,4 @@
-package rofleksey;
+package gen;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 
-public class RegexLexer {
+public class SetLexer {
     public enum TokenType {
-        LB, RB, OR, STAR, C,
+        DOLLAR, PERCENT, PLUS, MINUS, LB, RB, LS, RS, COMMA, LETTER,
         EOF
     }
 
@@ -28,22 +28,27 @@ public class RegexLexer {
         EOF_TOKEN = new Token(TokenType.EOF, "<EOF>");
         tokenTextBuilder = new StringBuilder();
 
+        trie.add("$", TokenType.DOLLAR);
+        trie.add("%", TokenType.PERCENT);
+        trie.add("+", TokenType.PLUS);
+        trie.add("-", TokenType.MINUS);
         trie.add("(", TokenType.LB);
         trie.add(")", TokenType.RB);
-        trie.add("|", TokenType.OR);
-        trie.add("*", TokenType.STAR);
-        AutomataState state0 = new AutomataState(TokenType.C);
-        AutomataArrow arrow0 = new AutomataArrow(Character::isLetter, state0);
-        dfa.getRoot().addArrow(arrow0);
+        trie.add("<", TokenType.LS);
+        trie.add(">", TokenType.RS);
+        trie.add(",", TokenType.COMMA);
+        AutomataState state2 = new AutomataState(TokenType.LETTER);
+        AutomataArrow arrow2 = new AutomataArrow(it -> 'a' <= it && it <= 'z', state2);
+        dfa.getRoot().addArrow(arrow2);
 
     }
 
-    public RegexLexer(String s) throws ParseException {
+    public SetLexer(String s) throws ParseException {
         this(new StringReader(s));
     }
 
 
-    public RegexLexer(Reader r) throws ParseException {
+    public SetLexer(Reader r) throws ParseException {
         reader = r;
         init();
         nextChar();

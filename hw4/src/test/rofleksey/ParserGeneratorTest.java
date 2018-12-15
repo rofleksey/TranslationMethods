@@ -14,21 +14,31 @@ class ParserGeneratorTest {
     }
 
     @Test
-    void textArithmetic() throws IOException {
+    void testArithmetic() throws IOException {
         Grammar g = GrammarParser.fromString(getFileContents("arithmetic.rofl"));
         LL1Table table = g.genLL1Table();
         System.out.println("LL1: " + table.isLL1());
-        ParserGenerator generator = new ParserGenerator(g, table, "Arithmetic", "rofleksey", Paths.get("./src/test/rofleksey/"));
+        ParserGenerator generator = new ParserGenerator(g, table, "Arithmetic", "gen", Paths.get("./src/test/gen/"));
         System.out.println();
         generator.generate();
     }
 
     @Test
-    void textRegex() throws IOException {
+    void testSets() throws IOException {
+        Grammar g = GrammarParser.fromString(getFileContents("sets.rofl"));
+        LL1Table table = g.genLL1Table();
+        System.out.println("LL1: " + table.isLL1());
+        ParserGenerator generator = new ParserGenerator(g, table, "Set", "gen", Paths.get("./src/test/gen/"));
+        System.out.println();
+        generator.generate();
+    }
+
+    @Test
+    void testRegex() throws IOException {
         Grammar g = GrammarParser.fromString(getFileContents("regex.rofl"));
         LL1Table table = g.genLL1Table();
         System.out.println("LL1: " + table.isLL1());
-        ParserGenerator generator = new ParserGenerator(g, table, "Regex", "rofleksey", Paths.get("./src/test/rofleksey/"));
+        ParserGenerator generator = new ParserGenerator(g, table, "Regex", "gen", Paths.get("./src/test/gen/"));
         System.out.println();
         generator.generate();
     }

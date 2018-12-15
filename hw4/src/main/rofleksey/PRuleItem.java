@@ -1,7 +1,11 @@
 package rofleksey;
 
+import java.util.ArrayList;
+
 public class PRuleItem {
     final String name, content;
+    ArrayList<String> arguments = new ArrayList<>();
+    private String code;
 
     PRuleItem(String content) {
         this.name = null;
@@ -13,22 +17,17 @@ public class PRuleItem {
         this.content = content;
     }
 
-    /*@Override
-    public int hashCode() {
-        return Objects.hash(name, content);
+    void setCode(String code) {
+        this.code = code;
     }
 
-    @Override
-    public boolean equals(Object o1) {
-        if(this == o1) {
-            return true;
-        }
-        if(o1 == null || getClass() != o1.getClass()) {
-            return false;
-        }
-        PRuleItem o = (PRuleItem) o1;
-        return Objects.equals(name, o.name) && Objects.equals(content, o.content);
-    }*/
+    boolean hasCode() {
+        return code != null;
+    }
+
+    String getCode() {
+        return code == null ? null : code.substring(1, code.length() - 1).replace("$", "result");
+    }
 
     @Override
     public String toString() {
