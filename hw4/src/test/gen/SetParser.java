@@ -24,7 +24,6 @@ public class SetParser {
         void add(Tree... trees) {
             children.addAll(Arrays.asList(trees));
         }
-
         private void getText(StringBuilder builder) {
             if (isTerminal) {
                 builder.append(name);
@@ -34,7 +33,6 @@ public class SetParser {
                 }
             }
         }
-
         public String getText() {
             if (isTerminal) {
                 return name;
@@ -44,27 +42,21 @@ public class SetParser {
                 return builder.toString();
             }
         }
-
         public boolean isTerminal() {
             return isTerminal;
         }
-
         public String getName() {
             return name;
         }
-
         public ArrayList<Tree> getChildren() {
             return children;
         }
-
         public void setUserData(Object o) {
             userData = o;
         }
-
         public Object getUserData() {
             return userData;
         }
-
         @Override
         public String toString() {
             return children.size() == 0 ? name : "<" + name + ": " + children + ">";
@@ -73,13 +65,11 @@ public class SetParser {
 
     public static class TerminalContext extends Tree {
         private final SetLexer.Token token;
-
         private TerminalContext(SetLexer.Token token) {
             super(token.text);
             this.token = token;
             isTerminal = true;
         }
-
         public SetLexer.Token getToken() {
             return token;
         }
@@ -170,7 +160,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ DOLLAR ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR ] expected", lex.lastPos());
         }
     }
 
@@ -181,7 +171,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ PERCENT ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PERCENT ] expected", lex.lastPos());
         }
     }
 
@@ -192,7 +182,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ PLUS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PLUS ] expected", lex.lastPos());
         }
     }
 
@@ -203,7 +193,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ MINUS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ MINUS ] expected", lex.lastPos());
         }
     }
 
@@ -214,7 +204,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ LB ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
         }
     }
 
@@ -225,7 +215,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ RB ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
         }
     }
 
@@ -236,7 +226,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ LS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LS ] expected", lex.lastPos());
         }
     }
 
@@ -247,7 +237,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ RS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RS ] expected", lex.lastPos());
         }
     }
 
@@ -258,7 +248,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ COMMA ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ COMMA ] expected", lex.lastPos());
         }
     }
 
@@ -269,7 +259,7 @@ public class SetParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ LETTER ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LETTER ] expected", lex.lastPos());
         }
     }
 
@@ -292,7 +282,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.lastPos());
         }
     }
 
@@ -327,7 +317,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ EOF, MINUS, PLUS, RB ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, MINUS, PLUS, RB ] expected", lex.lastPos());
         }
     }
 
@@ -356,7 +346,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LB, LETTER, LS ] expected", lex.lastPos());
         }
     }
 
@@ -394,7 +384,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ DOLLAR, LETTER, LS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ DOLLAR, LETTER, LS ] expected", lex.lastPos());
         }
     }
 
@@ -416,7 +406,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ LETTER ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LETTER ] expected", lex.lastPos());
         }
     }
 
@@ -443,7 +433,7 @@ public class SetParser {
             }
 
             default:
-                throw new SetLexer.ParseException("Invalid character. Token types [ COMMA, RS ] expected", lex.curPos());
+                throw new SetLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ COMMA, RS ] expected", lex.lastPos());
         }
     }
 
@@ -456,7 +446,7 @@ public class SetParser {
         lex.nextToken();
         ExprContext t = expr();
         if (lex.curToken().type != SetLexer.TokenType.EOF) {
-            throw new SetLexer.ParseException("Unexpected end of input", lex.curPos());
+            throw new SetLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
     }

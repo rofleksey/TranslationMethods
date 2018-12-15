@@ -23,7 +23,6 @@ public class ArithmeticParser {
         void add(Tree... trees) {
             children.addAll(Arrays.asList(trees));
         }
-
         private void getText(StringBuilder builder) {
             if (isTerminal) {
                 builder.append(name);
@@ -33,7 +32,6 @@ public class ArithmeticParser {
                 }
             }
         }
-
         public String getText() {
             if (isTerminal) {
                 return name;
@@ -43,14 +41,12 @@ public class ArithmeticParser {
                 return builder.toString();
             }
         }
-
         public boolean isTerminal() {
             return isTerminal;
         }
         public String getName() {
             return name;
         }
-
         public ArrayList<Tree> getChildren() {
             return children;
         }
@@ -77,6 +73,7 @@ public class ArithmeticParser {
             return token;
         }
     }
+
 
 
     public static class EContext extends Tree {
@@ -142,7 +139,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ NUM ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ NUM ] expected", lex.lastPos());
         }
     }
 
@@ -153,7 +150,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ MULT ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ MULT ] expected", lex.lastPos());
         }
     }
 
@@ -164,7 +161,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ PLUS ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ PLUS ] expected", lex.lastPos());
         }
     }
 
@@ -175,7 +172,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ LB ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
         }
     }
 
@@ -186,7 +183,7 @@ public class ArithmeticParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ RB ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
         }
     }
 
@@ -208,7 +205,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ LB, NUM ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
         }
     }
 
@@ -234,7 +231,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ EOF, PLUS, RB ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, PLUS, RB ] expected", lex.lastPos());
         }
     }
 
@@ -255,7 +252,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ LB, NUM ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
         }
     }
 
@@ -282,7 +279,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ EOF, MULT, PLUS, RB ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, MULT, PLUS, RB ] expected", lex.lastPos());
         }
     }
 
@@ -309,7 +306,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException("Invalid character. Token types [ LB, NUM ] expected", lex.curPos());
+                throw new ArithmeticLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB, NUM ] expected", lex.lastPos());
         }
     }
 
@@ -322,7 +319,7 @@ public class ArithmeticParser {
         lex.nextToken();
         EContext t = E();
         if (lex.curToken().type != ArithmeticLexer.TokenType.EOF) {
-            throw new ArithmeticLexer.ParseException("Unexpected end of input", lex.curPos());
+            throw new ArithmeticLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
     }

@@ -87,7 +87,7 @@ public class %classnameParser {
         lex.nextToken();
         %mainRuleContext t = %mainToken();
         if(lex.curToken().type != %classnameLexer.TokenType.EOF) {
-            throw new %classnameLexer.ParseException("Unexpected end of input", lex.curPos());
+            throw new %classnameLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
     }

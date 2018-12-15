@@ -16,7 +16,7 @@ public class ArithmeticLexer {
     private final Reader reader;
     private Token curToken;
     private StringBuilder tokenTextBuilder;
-    private int curPos, curRead;
+    private int curPos = -1, lastPos = 0, curRead;
     private char curChar;
     private Trie trie;
     private Automata dfa;
@@ -53,9 +53,11 @@ public class ArithmeticLexer {
         if (curRead == -1) {
             return;
         }
-        curPos++;
         try {
             curRead = reader.read();
+            if (curRead != -1) {
+                curPos++;
+            }
             curChar = (char) curRead;
         } catch (IOException e) {
             throw new ParseException(e.getMessage(), curPos);
@@ -80,6 +82,7 @@ public class ArithmeticLexer {
             if (curRead == -1) {
                 return curToken = EOF_TOKEN;
             }
+            lastPos = curPos;
             trie.reset();
             dfa.reset();
             if (tokenTextBuilder.length() > 0) {
@@ -131,6 +134,10 @@ public class ArithmeticLexer {
 
     public int curPos() {
         return curPos;
+    }
+
+    public int lastPos() {
+        return lastPos;
     }
 
     public Token curToken() {

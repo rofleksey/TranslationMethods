@@ -23,7 +23,6 @@ public class RegexParser {
         void add(Tree... trees) {
             children.addAll(Arrays.asList(trees));
         }
-
         private void getText(StringBuilder builder) {
             if (isTerminal) {
                 builder.append(name);
@@ -33,7 +32,6 @@ public class RegexParser {
                 }
             }
         }
-
         public String getText() {
             if (isTerminal) {
                 return name;
@@ -43,14 +41,12 @@ public class RegexParser {
                 return builder.toString();
             }
         }
-
         public boolean isTerminal() {
             return isTerminal;
         }
         public String getName() {
             return name;
         }
-
         public ArrayList<Tree> getChildren() {
             return children;
         }
@@ -77,6 +73,7 @@ public class RegexParser {
             return token;
         }
     }
+
 
 
     public static class RContext extends Tree {
@@ -168,7 +165,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ LB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ LB ] expected", lex.lastPos());
         }
     }
 
@@ -179,7 +176,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ RB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ RB ] expected", lex.lastPos());
         }
     }
 
@@ -190,7 +187,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ OR ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ OR ] expected", lex.lastPos());
         }
     }
 
@@ -201,7 +198,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ STAR ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ STAR ] expected", lex.lastPos());
         }
     }
 
@@ -212,7 +209,7 @@ public class RegexParser {
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ C ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C ] expected", lex.lastPos());
         }
     }
 
@@ -236,7 +233,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ C, LB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
         }
     }
 
@@ -259,7 +256,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ C, LB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
         }
     }
 
@@ -282,7 +279,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ C, LB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
         }
     }
 
@@ -309,7 +306,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ C, LB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ C, LB ] expected", lex.lastPos());
         }
     }
 
@@ -336,7 +333,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ EOF, OR, RB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, OR, RB ] expected", lex.lastPos());
         }
     }
 
@@ -364,7 +361,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ EOF, C, LB, OR, RB ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, C, LB, OR, RB ] expected", lex.lastPos());
         }
     }
 
@@ -389,7 +386,7 @@ public class RegexParser {
             }
 
             default:
-                throw new RegexLexer.ParseException("Invalid character. Token types [ EOF, C, LB, OR, RB, STAR ] expected", lex.curPos());
+                throw new RegexLexer.ParseException("Invalid token " + lex.curToken().type + ". Token types [ EOF, C, LB, OR, RB, STAR ] expected", lex.lastPos());
         }
     }
 
@@ -402,7 +399,7 @@ public class RegexParser {
         lex.nextToken();
         RContext t = R();
         if (lex.curToken().type != RegexLexer.TokenType.EOF) {
-            throw new RegexLexer.ParseException("Unexpected end of input", lex.curPos());
+            throw new RegexLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
     }
