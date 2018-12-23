@@ -1,5 +1,6 @@
 package rofleksey;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -17,7 +18,16 @@ class GrammarParserTest {
     private void logGrammar(Grammar g) {
         g.prepare();
         System.out.println(g);
-        System.out.println(g.genLL1Table().isLL1());
+        LL1Table table = g.genLL1Table();
+        System.out.println(table.isLL1());
+        Assertions.assertTrue(table.isLL1());
+        System.out.println();
+    }
+
+    @Test
+    void testFF() throws IOException {
+        Grammar g = GrammarParser.fromString(getFileContents("ff.rofl"));
+        logGrammar(g);
     }
 
     @Test

@@ -1,8 +1,6 @@
 package gen;
 
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -75,59 +73,80 @@ public class ArithmeticParser {
     }
 
 
-
-    public static class EContext extends Tree {
+    public static class ExprContext extends Tree {
         public int num;
-        public TContext e1;
-        public E1Context e2;
+        public ExprFlexContext e;
+        public MultContext t;
 
 
-        private EContext() {
-            super("E");
+        private ExprContext() {
+            super("expr");
         }
     }
 
-    public static class E1Context extends Tree {
+    public static class ExprFlexContext extends Tree {
         public int num;
-        public TContext e1;
-        public E1Context e2;
+        public ExprFlexContext e;
+        public MultContext t;
 
 
-        private E1Context() {
-            super("E1");
+        private ExprFlexContext() {
+            super("exprFlex");
         }
     }
 
-    public static class TContext extends Tree {
+    public static class MultContext extends Tree {
         public int num;
-        public FContext e1;
-        public T1Context e2;
+        public MultFlexContext m;
+        public PowerContext p;
 
 
-        private TContext() {
-            super("T");
+        private MultContext() {
+            super("mult");
         }
     }
 
-    public static class T1Context extends Tree {
+    public static class MultFlexContext extends Tree {
         public int num;
-        public FContext e1;
-        public T1Context e2;
+        public MultFlexContext m;
+        public PowerContext p;
 
 
-        private T1Context() {
-            super("T1");
+        private MultFlexContext() {
+            super("multFlex");
         }
     }
 
-    public static class FContext extends Tree {
+    public static class PowerContext extends Tree {
         public int num;
-        public TerminalContext e;
-        public EContext e1;
+        public PowerFlexContext f;
+        public PrimaryContext p;
 
 
-        private FContext() {
-            super("F");
+        private PowerContext() {
+            super("power");
+        }
+    }
+
+    public static class PowerFlexContext extends Tree {
+        public int num;
+        public PowerContext f;
+
+
+        private PowerFlexContext() {
+            super("powerFlex");
+        }
+    }
+
+    public static class PrimaryContext extends Tree {
+        public int num;
+        public ExprContext e;
+        public TerminalContext n;
+        public PrimaryContext p;
+
+
+        private PrimaryContext() {
+            super("primary");
         }
     }
 
@@ -143,14 +162,25 @@ public class ArithmeticParser {
         }
     }
 
-    private TerminalContext MULT() throws ArithmeticLexer.ParseException {
+    private TerminalContext POW() throws ArithmeticLexer.ParseException {
         switch (lex.curToken().type) {
-            case MULT:
+            case POW:
                 ArithmeticLexer.Token token = lex.curToken();
                 lex.nextToken();
                 return new TerminalContext(token);
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "MULT", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "POW", lex);
+        }
+    }
+
+    private TerminalContext MULTIPLY() throws ArithmeticLexer.ParseException {
+        switch (lex.curToken().type) {
+            case MULTIPLY:
+                ArithmeticLexer.Token token = lex.curToken();
+                lex.nextToken();
+                return new TerminalContext(token);
+            default:
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "MULTIPLY", lex);
         }
     }
 
@@ -162,6 +192,17 @@ public class ArithmeticParser {
                 return new TerminalContext(token);
             default:
                 throw new ArithmeticLexer.ParseException(lex.curToken().type, "PLUS", lex);
+        }
+    }
+
+    private TerminalContext MINUS() throws ArithmeticLexer.ParseException {
+        switch (lex.curToken().type) {
+            case MINUS:
+                ArithmeticLexer.Token token = lex.curToken();
+                lex.nextToken();
+                return new TerminalContext(token);
+            default:
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "MINUS", lex);
         }
     }
 
@@ -188,45 +229,47 @@ public class ArithmeticParser {
     }
 
 
-    private EContext E() throws ArithmeticLexer.ParseException {
-        EContext result = new EContext();
+    private ExprContext expr() throws ArithmeticLexer.ParseException {
+        ExprContext result = new ExprContext();
 
 
         switch (lex.curToken().type) {
             case LB:
+            case MINUS:
             case NUM: {
-                TContext e1 = T();
-                E1Context e2 = E1();
-                result.num = e1.num + e2.num;
-                result.add(e1, e2);
-                result.e1 = e1;
-                result.e2 = e2;
+                MultContext t = mult();
+                ExprFlexContext e = exprFlex(t.num);
+                result.num = e.num;
+                result.add(t, e);
+                result.t = t;
+                result.e = e;
                 return result;
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, MINUS, NUM", lex);
         }
     }
 
-    private E1Context E1() throws ArithmeticLexer.ParseException {
-        E1Context result = new E1Context();
+    private ExprFlexContext exprFlex(int acc) throws ArithmeticLexer.ParseException {
+        ExprFlexContext result = new ExprFlexContext();
 
 
         switch (lex.curToken().type) {
             case PLUS: {
                 TerminalContext c1 = PLUS();
-                TContext e1 = T();
-                E1Context e2 = E1();
-                result.num = e1.num + e2.num;
-                result.add(c1, e1, e2);
-                result.e1 = e1;
-                result.e2 = e2;
+                MultContext t = mult();
+                int temp = acc + t.num;
+                ExprFlexContext e = exprFlex(temp);
+                result.num = e.num;
+                result.add(c1, t, e);
+                result.t = t;
+                result.e = e;
                 return result;
             }
             case EOF:
             case RB: {
-                result.num = 0;
+                result.num = acc;
                 return result;
             }
 
@@ -235,89 +278,143 @@ public class ArithmeticParser {
         }
     }
 
-    private TContext T() throws ArithmeticLexer.ParseException {
-        TContext result = new TContext();
+    private MultContext mult() throws ArithmeticLexer.ParseException {
+        MultContext result = new MultContext();
 
 
         switch (lex.curToken().type) {
             case LB:
+            case MINUS:
             case NUM: {
-                FContext e1 = F();
-                T1Context e2 = T1();
-                result.num = e1.num * e2.num;
-                result.add(e1, e2);
-                result.e1 = e1;
-                result.e2 = e2;
+                PowerContext p = power();
+                MultFlexContext m = multFlex(p.num);
+                result.num = m.num;
+                result.add(p, m);
+                result.p = p;
+                result.m = m;
                 return result;
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, MINUS, NUM", lex);
         }
     }
 
-    private T1Context T1() throws ArithmeticLexer.ParseException {
-        T1Context result = new T1Context();
+    private MultFlexContext multFlex(int acc) throws ArithmeticLexer.ParseException {
+        MultFlexContext result = new MultFlexContext();
 
 
         switch (lex.curToken().type) {
-            case MULT: {
-                TerminalContext c1 = MULT();
-                FContext e1 = F();
-                T1Context e2 = T1();
-                result.num = e1.num * e2.num;
-                result.add(c1, e1, e2);
-                result.e1 = e1;
-                result.e2 = e2;
+            case MULTIPLY: {
+                TerminalContext c1 = MULTIPLY();
+                PowerContext p = power();
+                int temp = acc * p.num;
+                MultFlexContext m = multFlex(temp);
+                result.num = m.num;
+                result.add(c1, p, m);
+                result.p = p;
+                result.m = m;
                 return result;
             }
             case EOF:
             case PLUS:
             case RB: {
-                result.num = 1;
+                result.num = acc;
                 return result;
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULT, PLUS, RB", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULTIPLY, PLUS, RB", lex);
         }
     }
 
-    private FContext F() throws ArithmeticLexer.ParseException {
-        FContext result = new FContext();
+    private PowerContext power() throws ArithmeticLexer.ParseException {
+        PowerContext result = new PowerContext();
 
 
         switch (lex.curToken().type) {
+            case LB:
+            case MINUS:
             case NUM: {
-                TerminalContext e = NUM();
-                result.num = e.getToken().toInt();
-                result.add(e);
-                result.e = e;
-                return result;
-            }
-            case LB: {
-                TerminalContext c1 = LB();
-                EContext e1 = E();
-                TerminalContext c3 = RB();
-                result.num = e1.num;
-                result.add(c1, e1, c3);
-                result.e1 = e1;
+                PrimaryContext p = primary();
+                PowerFlexContext f = powerFlex(p.num);
+                result.num = f.num;
+                result.add(p, f);
+                result.p = p;
+                result.f = f;
                 return result;
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, NUM", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, MINUS, NUM", lex);
         }
     }
 
-    public EContext parse(String s) throws ArithmeticLexer.ParseException {
-        return parse(new StringReader(s));
+    private PowerFlexContext powerFlex(int acc) throws ArithmeticLexer.ParseException {
+        PowerFlexContext result = new PowerFlexContext();
+
+
+        switch (lex.curToken().type) {
+            case EOF:
+            case MULTIPLY:
+            case PLUS:
+            case RB: {
+                result.num = acc;
+                return result;
+            }
+            case POW: {
+                TerminalContext c1 = POW();
+                PowerContext f = power();
+                result.num = (int) Math.pow(acc, f.num);
+                result.add(c1, f);
+                result.f = f;
+                return result;
+            }
+
+            default:
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULTIPLY, PLUS, POW, RB", lex);
+        }
     }
 
-    public EContext parse(Reader r) throws ArithmeticLexer.ParseException {
-        lex = new ArithmeticLexer(r);
+    private PrimaryContext primary() throws ArithmeticLexer.ParseException {
+        PrimaryContext result = new PrimaryContext();
+
+
+        switch (lex.curToken().type) {
+            case LB: {
+                TerminalContext c1 = LB();
+                ExprContext e = expr();
+                TerminalContext c3 = RB();
+                result.num = e.num;
+                result.add(c1, e, c3);
+                result.e = e;
+                return result;
+            }
+            case NUM: {
+                TerminalContext n = NUM();
+                result.num = n.getToken().toInt();
+                result.add(n);
+                result.n = n;
+                return result;
+            }
+            case MINUS: {
+                TerminalContext c1 = MINUS();
+                PrimaryContext p = primary();
+                result.num = -p.num;
+                result.add(c1, p);
+                result.p = p;
+                return result;
+            }
+
+            default:
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, MINUS, NUM", lex);
+        }
+    }
+
+    public ExprContext parse(String s) throws ArithmeticLexer.ParseException {
+        lex = new ArithmeticLexer(s);
         lex.nextToken();
-        EContext t = E();
+        ExprContext t = expr();
         if (lex.curToken().type != ArithmeticLexer.TokenType.EOF) {
             throw new ArithmeticLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }

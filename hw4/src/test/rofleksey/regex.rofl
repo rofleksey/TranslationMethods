@@ -27,4 +27,4 @@ lb := '('
 rb := ')'
 or := '|'
 star := '*'
-c := @singleLetter
+c := @'[a-zA-Z]'

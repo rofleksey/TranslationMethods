@@ -1,8 +1,6 @@
 package gen;
 
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -342,11 +340,6 @@ public class RegexParser {
 
 
         switch (lex.curToken().type) {
-            case EOF:
-            case OR:
-            case RB: {
-                return result;
-            }
             case C:
             case LB: {
                 SContext e1 = S();
@@ -357,6 +350,11 @@ public class RegexParser {
                 result.add(e1, e2);
                 result.e1 = e1;
                 result.e2 = e2;
+                return result;
+            }
+            case EOF:
+            case OR:
+            case RB: {
                 return result;
             }
 
@@ -391,11 +389,7 @@ public class RegexParser {
     }
 
     public RContext parse(String s) throws RegexLexer.ParseException {
-        return parse(new StringReader(s));
-    }
-
-    public RContext parse(Reader r) throws RegexLexer.ParseException {
-        lex = new RegexLexer(r);
+        lex = new RegexLexer(s);
         lex.nextToken();
         RContext t = R();
         if (lex.curToken().type != RegexLexer.TokenType.EOF) {

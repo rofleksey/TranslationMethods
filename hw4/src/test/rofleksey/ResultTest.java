@@ -10,7 +10,7 @@ class ResultTest {
 
     private void testArithmeticImpl(String test, int expected) throws ArithmeticLexer.ParseException {
         ArithmeticParser parser = new ArithmeticParser();
-        ArithmeticParser.EContext tree = parser.parse(test);
+        ArithmeticParser.ExprContext tree = parser.parse(test);
         assertEquals(expected, tree.num);
     }
 
@@ -39,11 +39,29 @@ class ResultTest {
     }
 
     @Test
+    void testArithmetic5() throws ArithmeticLexer.ParseException {
+        testArithmeticImpl("5+(6^3*7)^2+(8+9)*10^3+2*(3+4)+10+255^0",
+                2303174);
+    }
+
+    @Test
+    void testArithmetic6() throws ArithmeticLexer.ParseException {
+        testArithmeticImpl("2**3**2",
+                512);
+    }
+
+    @Test
+    void testArithmetic7() throws ArithmeticLexer.ParseException {
+        testArithmeticImpl("(2**3)**2",
+                64);
+    }
+
+    @Test
     void testArithmeticFail1() throws ArithmeticLexer.ParseException {
         ArithmeticLexer.ParseException exception = assertThrows(ArithmeticLexer.ParseException.class, () -> {
             testArithmeticImpl("5+", 0);
         });
-        assertEquals("Parse error: Invalid token EOF. Token types [ LB, NUM ] expected at pos=3", exception.getMessage());
+        assertEquals("Parse error: Invalid token EOF. Token types [ LB, MINUS, NUM ] expected at pos=3", exception.getMessage());
     }
 
     @Test
@@ -51,7 +69,7 @@ class ResultTest {
         ArithmeticLexer.ParseException exception = assertThrows(ArithmeticLexer.ParseException.class, () -> {
             testArithmeticImpl("5*5+()", 0);
         });
-        assertEquals("Parse error: Invalid token RB. Token types [ LB, NUM ] expected at pos=6", exception.getMessage());
+        assertEquals("Parse error: Invalid token RB. Token types [ LB, MINUS, NUM ] expected at pos=6", exception.getMessage());
     }
 
     @Test
@@ -60,6 +78,14 @@ class ResultTest {
             testArithmeticImpl("5*5+(1+2))))", 0);
         });
         assertEquals("Parse error: Got EOF before actual end of string at pos=10", exception.getMessage());
+    }
+
+    @Test
+    void testArithmeticFail4() throws ArithmeticLexer.ParseException {
+        ArithmeticLexer.ParseException exception = assertThrows(ArithmeticLexer.ParseException.class, () -> {
+            testArithmeticImpl("5+5a", 0);
+        });
+        assertEquals("Parse error: Invalid input at pos=4", exception.getMessage());
     }
 
     private void testRegexImpl(String test, int stars, int ors) throws RegexLexer.ParseException {
@@ -103,6 +129,14 @@ class ResultTest {
         assertEquals("Parse error: Invalid input at pos=5", exception.getMessage());
     }
 
+    @Test
+    void testRegexFail4() throws RegexLexer.ParseException {
+        RegexLexer.ParseException exception = assertThrows(RegexLexer.ParseException.class, () -> {
+            testRegexImpl("w|1", 0, 0);
+        });
+        assertEquals("Parse error: Invalid input at pos=3", exception.getMessage());
+    }
+
     private void testSetsImpl(String test, String expected) throws SetLexer.ParseException {
         SetParser parser = new SetParser();
         SetParser.ExprContext tree = parser.parse(test);
@@ -132,7 +166,7 @@ class ResultTest {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
             testSetsImpl("<>", "");
         });
-        assertEquals("Parse error: Invalid input at pos=2", exception.getMessage());
+        assertEquals("Parse error: Invalid input at pos=1", exception.getMessage());
     }
 
     @Test
@@ -156,7 +190,7 @@ class ResultTest {
         SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
             testSetsImpl("<<a>>$+<<b>>", "");
         });
-        assertEquals("Parse error: Invalid input at pos=7", exception.getMessage());
+        assertEquals("Parse error: Invalid input at pos=6", exception.getMessage());
     }
 
     @Test
@@ -165,5 +199,13 @@ class ResultTest {
             testSetsImpl("<<a>>$all+<<b>>", "");
         });
         assertEquals("Parse error: Invalid token DOLLAR. Token types [ EOF, MINUS, PLUS, RB ] expected at pos=6", exception.getMessage());
+    }
+
+    @Test
+    void testSetsFail7() throws SetLexer.ParseException {
+        SetLexer.ParseException exception = assertThrows(SetLexer.ParseException.class, () -> {
+            testSetsImpl("<<A1>>", "");
+        });
+        assertEquals("Parse error: Invalid input at pos=3", exception.getMessage());
     }
 }

@@ -1,7 +1,5 @@
 package gen;
 
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -326,15 +324,6 @@ public class SetParser {
 
 
         switch (lex.curToken().type) {
-            case LB: {
-                TerminalContext c1 = LB();
-                ExprContext e1 = expr();
-                TerminalContext c3 = RB();
-                result.set = e1.set;
-                result.add(c1, e1, c3);
-                result.e1 = e1;
-                return result;
-            }
             case DOLLAR:
             case LETTER:
             case LS: {
@@ -342,6 +331,15 @@ public class SetParser {
                 result.set = e.set;
                 result.add(e);
                 result.e = e;
+                return result;
+            }
+            case LB: {
+                TerminalContext c1 = LB();
+                ExprContext e1 = expr();
+                TerminalContext c3 = RB();
+                result.set = e1.set;
+                result.add(c1, e1, c3);
+                result.e1 = e1;
                 return result;
             }
 
@@ -438,11 +436,7 @@ public class SetParser {
     }
 
     public ExprContext parse(String s) throws SetLexer.ParseException {
-        return parse(new StringReader(s));
-    }
-
-    public ExprContext parse(Reader r) throws SetLexer.ParseException {
-        lex = new SetLexer(r);
+        lex = new SetLexer(s);
         lex.nextToken();
         ExprContext t = expr();
         if (lex.curToken().type != SetLexer.TokenType.EOF) {

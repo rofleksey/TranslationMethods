@@ -78,7 +78,7 @@ argList
     ;
 
 lRule locals [boolean special]
-    : name=Identifier Flex (At content=Identifier {$special = true;} | content=String)
+    : name=Identifier Flex (At {$special = true;})? content=String
     ;
 
 Arrow: '->';

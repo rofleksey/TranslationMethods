@@ -79,11 +79,7 @@ public class %classnameParser {
 %terminals
 %builders
     public %mainRuleContext parse(String s) throws %classnameLexer.ParseException {
-        return parse(new StringReader(s));
-    }
-
-    public %mainRuleContext parse(Reader r) throws %classnameLexer.ParseException {
-        lex = new %classnameLexer(r);
+        lex = new %classnameLexer(s);
         lex.nextToken();
         %mainRuleContext t = %mainToken();
         if(lex.curToken().type != %classnameLexer.TokenType.EOF) {

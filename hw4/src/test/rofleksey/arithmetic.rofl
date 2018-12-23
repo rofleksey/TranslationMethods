@@ -1,23 +1,33 @@
-E -> [int num]
-    e1=T e2=E1 {$.num = e1.num + e2.num}
+expr -> [int num]
+    t=mult e=exprFlex(t.num) {$.num = e.num}
 
-E1 -> [int num]
-    PLUS e1=T e2=E1 {$.num = e1.num + e2.num}
-    @ {$.num = 0}
+exprFlex -> (int acc) [int num]
+    PLUS t=mult {int temp = acc+t.num} e=exprFlex(temp) {$.num = e.num}
+    @ {$.num = acc}
 
-T -> [int num]
-    e1=F e2=T1 {$.num = e1.num * e2.num}
+mult -> [int num]
+    p=power m=multFlex(p.num){$.num = m.num}
 
-T1 -> [int num]
-    MULT e1=F e2=T1 {$.num = e1.num * e2.num}
-    @ {$.num = 1}
+multFlex -> (int acc) [int num]
+    MULTIPLY p=power {int temp = acc * p.num} m=multFlex(temp) {$.num = m.num}
+    @ {$.num = acc}
 
-F -> [int num]
-    e=NUM {$.num = e.getToken().toInt()}
-    LB e1=E RB {$.num = e1.num}
+power -> [int num]
+    p=primary f=powerFlex(p.num) {$.num = f.num}
 
-NUM := @number
-MULT := '*'
+powerFlex -> (int acc) [int num]
+    POW f=power {$.num = (int) Math.pow(acc, f.num)}
+    @ {$.num = acc}
+
+primary -> [int num]
+    LB e=expr RB {$.num = e.num}
+    n=NUM {$.num = n.getToken().toInt()}
+    MINUS p=primary {$.num = -p.num}
+
+NUM := @'[0-9]+'
+POW := @'\^|\*\*'
+MULTIPLY := '*'
 PLUS := '+'
+MINUS := '-'
 LB := '('
 RB := ')'
