@@ -7,56 +7,26 @@ import java.util.Arrays;
 public class RegexParser {
     private RegexLexer lex;
 
-    public static class Tree {
-        private final String name;
-        private final ArrayList<Tree> children;
-        private Object userData;
-        boolean isTerminal;
+    private RContext R() throws RegexLexer.ParseException {
+        RContext result = new RContext();
 
-        private Tree(String name) {
-            this.name = name;
-            children = new ArrayList<>();
-        }
 
-        void add(Tree... trees) {
-            children.addAll(Arrays.asList(trees));
-        }
-        private void getText(StringBuilder builder) {
-            if (isTerminal) {
-                builder.append(name);
-            } else {
-                for (Tree t : children) {
-                    t.getText(builder);
-                }
+        switch (lex.curToken().type) {
+            case C:
+            case LB: {
+                DContext e1 = D();
+                RFlexContext e2 = RFlex();
+                result.ors = e1.ors + e2.ors;
+                result.stars = e1.stars + e2.stars;
+                ;
+                result.add(e1, e2);
+                result.e1 = e1;
+                result.e2 = e2;
+                return result;
             }
-        }
-        public String getText() {
-            if (isTerminal) {
-                return name;
-            } else {
-                StringBuilder builder = new StringBuilder();
-                getText(builder);
-                return builder.toString();
-            }
-        }
-        public boolean isTerminal() {
-            return isTerminal;
-        }
-        public String getName() {
-            return name;
-        }
-        public ArrayList<Tree> getChildren() {
-            return children;
-        }
-        public void setUserData(Object o) {
-            userData = o;
-        }
-        public Object getUserData() {
-            return userData;
-        }
-        @Override
-        public String toString() {
-            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
+
+            default:
+                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
         }
     }
 
@@ -211,30 +181,6 @@ public class RegexParser {
         }
     }
 
-
-    private RContext R() throws RegexLexer.ParseException {
-        RContext result = new RContext();
-
-
-        switch (lex.curToken().type) {
-            case C:
-            case LB: {
-                DContext e1 = D();
-                RFlexContext e2 = RFlex();
-                result.ors = e1.ors + e2.ors;
-                result.stars = e1.stars + e2.stars;
-                ;
-                result.add(e1, e2);
-                result.e1 = e1;
-                result.e2 = e2;
-                return result;
-            }
-
-            default:
-                throw new RegexLexer.ParseException(lex.curToken().type, "C, LB", lex);
-        }
-    }
-
     private DContext D() throws RegexLexer.ParseException {
         DContext result = new DContext();
 
@@ -286,6 +232,11 @@ public class RegexParser {
 
 
         switch (lex.curToken().type) {
+            case C: {
+                TerminalContext c1 = c();
+                result.add(c1);
+                return result;
+            }
             case LB: {
                 TerminalContext c1 = lb();
                 RContext e1 = R();
@@ -295,11 +246,6 @@ public class RegexParser {
                 ;
                 result.add(c1, e1, c3);
                 result.e1 = e1;
-                return result;
-            }
-            case C: {
-                TerminalContext c1 = c();
-                result.add(c1);
                 return result;
             }
 
@@ -396,5 +342,66 @@ public class RegexParser {
             throw new RegexLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
+    }
+
+    public static class Tree {
+        private final String name;
+        private final ArrayList<Tree> children;
+        private Object userData;
+        boolean isTerminal;
+
+        private Tree(String name) {
+            this.name = name;
+            children = new ArrayList<>();
+        }
+
+        void add(Tree... trees) {
+            children.addAll(Arrays.asList(trees));
+        }
+
+        private void getText(StringBuilder builder) {
+            if (isTerminal) {
+                builder.append(name);
+            } else {
+                for (Tree t : children) {
+                    t.getText(builder);
+                }
+            }
+        }
+
+        public String getText() {
+            if (isTerminal) {
+                return name;
+            } else {
+                StringBuilder builder = new StringBuilder();
+                getText(builder);
+                return builder.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ArrayList<Tree> getChildren() {
+            return children;
+        }
+
+        public void setUserData(Object o) {
+            userData = o;
+        }
+
+        public Object getUserData() {
+            return userData;
+        }
+
+        @Override
+        public String toString() {
+            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
+        }
     }
 }

@@ -1,3 +1,4 @@
+/*
 package rofleksey;
 
 import gen.*;
@@ -34,8 +35,8 @@ class ResultTest {
 
     @Test
     void testArithmetic4() throws ArithmeticLexer.ParseException {
-        testArithmeticImpl("5+6*7+(8+9)*10+2*(3+4)+10",
-                5 + 6 * 7 + (8 + 9) * 10 + 2 * (3 + 4) + 10);
+        testArithmeticImpl("5-6*7+(8+9)*10+2*(3+4)+10",
+                5 - 6 * 7 + (8 + 9) * 10 + 2 * (3 + 4) + 10);
     }
 
     @Test
@@ -46,7 +47,7 @@ class ResultTest {
 
     @Test
     void testArithmetic6() throws ArithmeticLexer.ParseException {
-        testArithmeticImpl("2**3**2",
+        testArithmeticImpl("2**3**3",
                 512);
     }
 
@@ -54,6 +55,18 @@ class ResultTest {
     void testArithmetic7() throws ArithmeticLexer.ParseException {
         testArithmeticImpl("(2**3)**2",
                 64);
+    }
+
+    @Test
+    void testArithmetic8() throws ArithmeticLexer.ParseException {
+        testArithmeticImpl("1-2-3",
+                1-2-3);
+    }
+
+    @Test
+    void testArithmetic9() throws ArithmeticLexer.ParseException {
+        testArithmeticImpl("--20",
+                20);
     }
 
     @Test
@@ -209,3 +222,4 @@ class ResultTest {
         assertEquals("Parse error: Invalid input at pos=3", exception.getMessage());
     }
 }
+*/

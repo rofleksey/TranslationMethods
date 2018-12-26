@@ -88,6 +88,35 @@ public class ArithmeticLexer {
         return curToken;
     }
 
+    public static class Token {
+        public final TokenType type;
+        public final String text;
+
+        Token(TokenType type, String text) {
+            this.type = type;
+            this.text = text;
+        }
+
+        int toInt() {
+            return Integer.valueOf(text);
+        }
+
+        @Override
+        public String toString() {
+            return "{text = '" + text + "', type = " + type + "}";
+        }
+    }
+
+    public static class ParseException extends Exception {
+        ParseException(String cause, int at) {
+            super("Parse error: " + cause + " at pos=" + (at + 1));
+        }
+
+        ParseException(TokenType type, String expected, ArithmeticLexer lex) {
+            this("Invalid token " + type + ". Token types [ " + expected + " ] expected", type != TokenType.EOF ? lex.lastPos() : lex.curPos() + 1);
+        }
+    }
+
     private class TokenMatcher {
         final TokenType type;
         private final Pattern pattern;
@@ -121,34 +150,6 @@ public class ArithmeticLexer {
 
         String getMatch() {
             return last;
-        }
-    }
-
-    public static class Token {
-        public final TokenType type;
-        public final String text;
-
-        Token(TokenType type, String text) {
-            this.type = type;
-            this.text = text;
-        }
-
-        int toInt() {
-            return Integer.valueOf(text);
-        }
-
-        @Override
-        public String toString() {
-            return "{text = '" + text + "', type = " + type + "}";
-        }
-    }
-
-    public static class ParseException extends Exception {
-        ParseException(String cause, int at) {
-            super("Parse error: " + cause + " at pos=" + (at + 1));
-        }
-        ParseException(TokenType type, String expected, ArithmeticLexer lex) {
-            this("Invalid token " + type + ". Token types [ " + expected + " ] expected", type != TokenType.EOF ? lex.lastPos() : lex.curPos() + 1);
         }
     }
 }

@@ -58,6 +58,9 @@ public class ParserGenerator {
 
     public void generate() throws IOException {
         init();
+        if (grammar.hasRightBranching()) {
+            throw new IOException("Grammar contains right branching!");
+        }
         generateLexer();
         generateParser();
     }

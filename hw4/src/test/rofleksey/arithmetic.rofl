@@ -3,6 +3,7 @@ expr -> [int num]
 
 exprFlex -> (int acc) [int num]
     PLUS t=mult {int temp = acc+t.num} e=exprFlex(temp) {$.num = e.num}
+    MINUS t=mult {int temp = acc-t.num} e=exprFlex(temp) {$.num = e.num}
     @ {$.num = acc}
 
 mult -> [int num]

@@ -31,6 +31,19 @@ public class Grammar {
         return pRules.toString();
     }
 
+    boolean hasRightBranching() {
+        for (ParserRule rule : pRules) {
+            for (int i = 0; i < rule.branches.size(); i++) {
+                for (int j = i + 1; j < rule.branches.size(); j++) {
+                    if (Branch.hasCommonPrefix(rule.branches.get(i), rule.branches.get(j))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean calcNullablesHelper(Map<String, Boolean> result, String key, Set<String> path) {
         if (path.contains(key)) {
             return false;

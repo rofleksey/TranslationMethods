@@ -8,57 +8,12 @@ import java.util.Set;
 public class SetParser {
     private SetLexer lex;
 
-    public static class Tree {
-        private final String name;
-        private final ArrayList<Tree> children;
-        private Object userData;
-        boolean isTerminal;
-
-        private Tree(String name) {
-            this.name = name;
-            children = new ArrayList<>();
+    Set<String> createRange(char from, char to) {
+        HashSet<String> set = new HashSet<>();
+        for (char c = from; c <= to; c++) {
+            set.add(Character.toString(c));
         }
-
-        void add(Tree... trees) {
-            children.addAll(Arrays.asList(trees));
-        }
-        private void getText(StringBuilder builder) {
-            if (isTerminal) {
-                builder.append(name);
-            } else {
-                for (Tree t : children) {
-                    t.getText(builder);
-                }
-            }
-        }
-        public String getText() {
-            if (isTerminal) {
-                return name;
-            } else {
-                StringBuilder builder = new StringBuilder();
-                getText(builder);
-                return builder.toString();
-            }
-        }
-        public boolean isTerminal() {
-            return isTerminal;
-        }
-        public String getName() {
-            return name;
-        }
-        public ArrayList<Tree> getChildren() {
-            return children;
-        }
-        public void setUserData(Object o) {
-            userData = o;
-        }
-        public Object getUserData() {
-            return userData;
-        }
-        @Override
-        public String toString() {
-            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
-        }
+        return set;
     }
 
     public static class TerminalContext extends Tree {
@@ -77,12 +32,42 @@ public class SetParser {
         return createRange('a', 'z');
     }
 
-    Set<String> createRange(char from, char to) {
-        HashSet<String> set = new HashSet<>();
-        for (char c = from; c <= to; c++) {
-            set.add(Character.toString(c));
+    private SetDefContext setDef() throws SetLexer.ParseException {
+        SetDefContext result = new SetDefContext();
+
+
+        switch (lex.curToken().type) {
+            case DOLLAR: {
+                TerminalContext c1 = DOLLAR();
+                result.set = createFullSet();
+                System.out.println(result.set);
+                result.add(c1);
+                return result;
+            }
+            case LS: {
+                TerminalContext c1 = LS();
+                SetListContext e = setList();
+                TerminalContext c3 = RS();
+                result.set = e.set;
+                result.add(c1, e, c3);
+                result.e = e;
+                return result;
+            }
+            case LETTER: {
+                TerminalContext l1 = LETTER();
+                TerminalContext c2 = PERCENT();
+                TerminalContext l2 = LETTER();
+                result.set = createRange(l1.getText().charAt(0), l2.getText().charAt(0));
+                System.out.println(result.set);
+                result.add(l1, c2, l2);
+                result.l1 = l1;
+                result.l2 = l2;
+                return result;
+            }
+
+            default:
+                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR, LETTER, LS", lex);
         }
-        return set;
     }
 
 
@@ -348,44 +333,6 @@ public class SetParser {
         }
     }
 
-    private SetDefContext setDef() throws SetLexer.ParseException {
-        SetDefContext result = new SetDefContext();
-
-
-        switch (lex.curToken().type) {
-            case LS: {
-                TerminalContext c1 = LS();
-                SetListContext e = setList();
-                TerminalContext c3 = RS();
-                result.set = e.set;
-                result.add(c1, e, c3);
-                result.e = e;
-                return result;
-            }
-            case LETTER: {
-                TerminalContext l1 = LETTER();
-                TerminalContext c2 = PERCENT();
-                TerminalContext l2 = LETTER();
-                result.set = createRange(l1.getText().charAt(0), l2.getText().charAt(0));
-                System.out.println(result.set);
-                result.add(l1, c2, l2);
-                result.l1 = l1;
-                result.l2 = l2;
-                return result;
-            }
-            case DOLLAR: {
-                TerminalContext c1 = DOLLAR();
-                result.set = createFullSet();
-                System.out.println(result.set);
-                result.add(c1);
-                return result;
-            }
-
-            default:
-                throw new SetLexer.ParseException(lex.curToken().type, "DOLLAR, LETTER, LS", lex);
-        }
-    }
-
     private SetListContext setList() throws SetLexer.ParseException {
         SetListContext result = new SetListContext();
 
@@ -443,5 +390,66 @@ public class SetParser {
             throw new SetLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
+    }
+
+    public static class Tree {
+        private final String name;
+        private final ArrayList<Tree> children;
+        private Object userData;
+        boolean isTerminal;
+
+        private Tree(String name) {
+            this.name = name;
+            children = new ArrayList<>();
+        }
+
+        void add(Tree... trees) {
+            children.addAll(Arrays.asList(trees));
+        }
+
+        private void getText(StringBuilder builder) {
+            if (isTerminal) {
+                builder.append(name);
+            } else {
+                for (Tree t : children) {
+                    t.getText(builder);
+                }
+            }
+        }
+
+        public String getText() {
+            if (isTerminal) {
+                return name;
+            } else {
+                StringBuilder builder = new StringBuilder();
+                getText(builder);
+                return builder.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ArrayList<Tree> getChildren() {
+            return children;
+        }
+
+        public void setUserData(Object o) {
+            userData = o;
+        }
+
+        public Object getUserData() {
+            return userData;
+        }
+
+        @Override
+        public String toString() {
+            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
+        }
     }
 }

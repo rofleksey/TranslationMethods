@@ -7,56 +7,41 @@ import java.util.Arrays;
 public class ArithmeticParser {
     private ArithmeticLexer lex;
 
-    public static class Tree {
-        private final String name;
-        private final ArrayList<Tree> children;
-        private Object userData;
-        boolean isTerminal;
+    private ExprFlexContext exprFlex(int acc) throws ArithmeticLexer.ParseException {
+        ExprFlexContext result = new ExprFlexContext();
 
-        private Tree(String name) {
-            this.name = name;
-            children = new ArrayList<>();
-        }
 
-        void add(Tree... trees) {
-            children.addAll(Arrays.asList(trees));
-        }
-        private void getText(StringBuilder builder) {
-            if (isTerminal) {
-                builder.append(name);
-            } else {
-                for (Tree t : children) {
-                    t.getText(builder);
-                }
+        switch (lex.curToken().type) {
+            case PLUS: {
+                TerminalContext c1 = PLUS();
+                MultContext t = mult();
+                int temp = acc + t.num;
+                ExprFlexContext e = exprFlex(temp);
+                result.num = e.num;
+                result.add(c1, t, e);
+                result.t = t;
+                result.e = e;
+                return result;
             }
-        }
-        public String getText() {
-            if (isTerminal) {
-                return name;
-            } else {
-                StringBuilder builder = new StringBuilder();
-                getText(builder);
-                return builder.toString();
+            case MINUS: {
+                TerminalContext c1 = MINUS();
+                MultContext t = mult();
+                int temp = acc - t.num;
+                ExprFlexContext e = exprFlex(temp);
+                result.num = e.num;
+                result.add(c1, t, e);
+                result.t = t;
+                result.e = e;
+                return result;
             }
-        }
-        public boolean isTerminal() {
-            return isTerminal;
-        }
-        public String getName() {
-            return name;
-        }
-        public ArrayList<Tree> getChildren() {
-            return children;
-        }
-        public void setUserData(Object o) {
-            userData = o;
-        }
-        public Object getUserData() {
-            return userData;
-        }
-        @Override
-        public String toString() {
-            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
+            case EOF:
+            case RB: {
+                result.num = acc;
+                return result;
+            }
+
+            default:
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MINUS, PLUS, RB", lex);
         }
     }
 
@@ -71,6 +56,7 @@ public class ArithmeticParser {
             return token;
         }
     }
+
 
 
     public static class ExprContext extends Tree {
@@ -251,30 +237,32 @@ public class ArithmeticParser {
         }
     }
 
-    private ExprFlexContext exprFlex(int acc) throws ArithmeticLexer.ParseException {
-        ExprFlexContext result = new ExprFlexContext();
+    private MultFlexContext multFlex(int acc) throws ArithmeticLexer.ParseException {
+        MultFlexContext result = new MultFlexContext();
 
 
         switch (lex.curToken().type) {
-            case PLUS: {
-                TerminalContext c1 = PLUS();
-                MultContext t = mult();
-                int temp = acc + t.num;
-                ExprFlexContext e = exprFlex(temp);
-                result.num = e.num;
-                result.add(c1, t, e);
-                result.t = t;
-                result.e = e;
+            case MULTIPLY: {
+                TerminalContext c1 = MULTIPLY();
+                PowerContext p = power();
+                int temp = acc * p.num;
+                MultFlexContext m = multFlex(temp);
+                result.num = m.num;
+                result.add(c1, p, m);
+                result.p = p;
+                result.m = m;
                 return result;
             }
             case EOF:
+            case MINUS:
+            case PLUS:
             case RB: {
                 result.num = acc;
                 return result;
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, PLUS, RB", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MINUS, MULTIPLY, PLUS, RB", lex);
         }
     }
 
@@ -300,23 +288,22 @@ public class ArithmeticParser {
         }
     }
 
-    private MultFlexContext multFlex(int acc) throws ArithmeticLexer.ParseException {
-        MultFlexContext result = new MultFlexContext();
+    private PowerFlexContext powerFlex(int acc) throws ArithmeticLexer.ParseException {
+        PowerFlexContext result = new PowerFlexContext();
 
 
         switch (lex.curToken().type) {
-            case MULTIPLY: {
-                TerminalContext c1 = MULTIPLY();
-                PowerContext p = power();
-                int temp = acc * p.num;
-                MultFlexContext m = multFlex(temp);
-                result.num = m.num;
-                result.add(c1, p, m);
-                result.p = p;
-                result.m = m;
+            case POW: {
+                TerminalContext c1 = POW();
+                PowerContext f = power();
+                result.num = (int) Math.pow(acc, f.num);
+                result.add(c1, f);
+                result.f = f;
                 return result;
             }
             case EOF:
+            case MINUS:
+            case MULTIPLY:
             case PLUS:
             case RB: {
                 result.num = acc;
@@ -324,7 +311,7 @@ public class ArithmeticParser {
             }
 
             default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULTIPLY, PLUS, RB", lex);
+                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MINUS, MULTIPLY, PLUS, POW, RB", lex);
         }
     }
 
@@ -350,37 +337,19 @@ public class ArithmeticParser {
         }
     }
 
-    private PowerFlexContext powerFlex(int acc) throws ArithmeticLexer.ParseException {
-        PowerFlexContext result = new PowerFlexContext();
-
-
-        switch (lex.curToken().type) {
-            case EOF:
-            case MULTIPLY:
-            case PLUS:
-            case RB: {
-                result.num = acc;
-                return result;
-            }
-            case POW: {
-                TerminalContext c1 = POW();
-                PowerContext f = power();
-                result.num = (int) Math.pow(acc, f.num);
-                result.add(c1, f);
-                result.f = f;
-                return result;
-            }
-
-            default:
-                throw new ArithmeticLexer.ParseException(lex.curToken().type, "EOF, MULTIPLY, PLUS, POW, RB", lex);
-        }
-    }
-
     private PrimaryContext primary() throws ArithmeticLexer.ParseException {
         PrimaryContext result = new PrimaryContext();
 
 
         switch (lex.curToken().type) {
+            case MINUS: {
+                TerminalContext c1 = MINUS();
+                PrimaryContext p = primary();
+                result.num = -p.num;
+                result.add(c1, p);
+                result.p = p;
+                return result;
+            }
             case LB: {
                 TerminalContext c1 = LB();
                 ExprContext e = expr();
@@ -397,14 +366,6 @@ public class ArithmeticParser {
                 result.n = n;
                 return result;
             }
-            case MINUS: {
-                TerminalContext c1 = MINUS();
-                PrimaryContext p = primary();
-                result.num = -p.num;
-                result.add(c1, p);
-                result.p = p;
-                return result;
-            }
 
             default:
                 throw new ArithmeticLexer.ParseException(lex.curToken().type, "LB, MINUS, NUM", lex);
@@ -419,5 +380,66 @@ public class ArithmeticParser {
             throw new ArithmeticLexer.ParseException("Got EOF before actual end of string", lex.lastPos());
         }
         return t;
+    }
+
+    public static class Tree {
+        private final String name;
+        private final ArrayList<Tree> children;
+        private Object userData;
+        boolean isTerminal;
+
+        private Tree(String name) {
+            this.name = name;
+            children = new ArrayList<>();
+        }
+
+        void add(Tree... trees) {
+            children.addAll(Arrays.asList(trees));
+        }
+
+        private void getText(StringBuilder builder) {
+            if (isTerminal) {
+                builder.append(name);
+            } else {
+                for (Tree t : children) {
+                    t.getText(builder);
+                }
+            }
+        }
+
+        public String getText() {
+            if (isTerminal) {
+                return name;
+            } else {
+                StringBuilder builder = new StringBuilder();
+                getText(builder);
+                return builder.toString();
+            }
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ArrayList<Tree> getChildren() {
+            return children;
+        }
+
+        public void setUserData(Object o) {
+            userData = o;
+        }
+
+        public Object getUserData() {
+            return userData;
+        }
+
+        @Override
+        public String toString() {
+            return children.size() == 0 ? name : "<" + name + ": " + children + ">";
+        }
     }
 }

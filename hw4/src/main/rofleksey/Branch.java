@@ -25,6 +25,15 @@ public class Branch {
         return initCode == null ? null : initCode.substring(1, initCode.length() - 1).replace("$", "result");
     }
 
+    static boolean hasCommonPrefix(Branch a, Branch b) {
+        if (Math.min(a.items.size(), b.items.size()) > 0) {
+            if (a.items.get(0).content.equals(b.items.get(0).content)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public int hashCode() {
         return num;
